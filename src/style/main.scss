@@ -1,0 +1,22 @@
+.main {
+  width: 500px;
+  margin: 0 auto;
+  margin-top: 175px;
+}
+
+.miner {
+  height: 500px;
+  display: grid;
+  background: #384c59;
+  border-radius: 5px;
+}
+
+.cell {
+  background-color: #fff4f4;
+  border-radius: 5px;
+  border: 2px solid #384c59;
+}
+
+.open {
+  border-color: darkblue;
+}
