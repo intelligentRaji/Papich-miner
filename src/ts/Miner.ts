@@ -14,8 +14,8 @@ export class Miner extends BaseComponent {
     super({ tag: "div", className: "miner", parent });
     this.size = 10;
     this.fields = this.getCells();
-    this.element.style.gridTemplateColumns = "repeat(10, 1fr)";
-    this.element.style.gridTemplateRows = "repeat(10, 1fr)";
+    this.stylize("gridTemplateColumns", "repeat(10, 1fr)");
+    this.stylize("gridTemplateRows", "repeat(10, 1fr)");
   }
 
   private getCells(): Cell[][] {
@@ -48,10 +48,10 @@ export class Miner extends BaseComponent {
           j >= indexJ - 1 &&
           j <= indexJ + 1
         ) &&
-        !bombField.isBomb
+        !bombField.state.isBomb
       ) {
-        bombField.isBomb = true;
-        bombField.element.style.backgroundColor = "red";
+        bombField.state.RezanskiSahar();
+        bombField.stylize("backgroundColor", "red");
         if (bombField.bombsAround.length !== 0) {
           bombField.bombsAround = [];
         }
@@ -70,7 +70,7 @@ export class Miner extends BaseComponent {
           x < this.fields.length &&
           y >= 0 &&
           y < this.fields.length &&
-          !this.fields[x][y].isBomb
+          !this.fields[x][y].state.isBomb
         ) {
           this.fields[x][y].addBomb(element);
         }

@@ -1,3 +1,4 @@
+import { CellState } from "./CellState";
 import { BaseComponent } from "./components/BaseComponent";
 
 interface FieldConstructor {
@@ -14,63 +15,60 @@ export class Cell extends BaseComponent {
   public readonly column: number;
   public bombsAround: Cell[] = [];
   public falgsAround: number = 0;
-  public isBomb = false;
-  public isOpen = false;
-  public isFlaged = false;
-  public podVoprosikom = false;
+  public state: CellState;
 
   constructor({ parent, className, coordinates }: FieldConstructor) {
     super({ tag: "button", className, parent });
     this.row = coordinates.i;
     this.column = coordinates.j;
+    this.state = new CellState();
   }
 
   public addBomb(bomb: Cell): void {
     this.bombsAround.push(bomb);
   }
 
-  public rightClickMechanic(): void {
-    if (this.podVoprosikom) {
+  public rightClickMechanic = (): void => {
+    if (this.state.podVoprosikom) {
       this.clear();
     }
-    if (this.isFlaged) {
+    if (this.state.isFlaged) {
       this.makeQuestioned();
     }
-    if (!this.isFlaged && !this.podVoprosikom) {
+    if (!this.state.isFlaged && !this.state.podVoprosikom) {
       this.hoistFlag();
     }
-  }
+  };
 
   private hoistFlag(): void {
-    this.isFlaged = true;
-    this.element.classList.add("flaged");
+    this.state.hoistFlag();
+    this.addClass("flaged");
     this.emit("flag", [this.row, this.column, "flag"]);
   }
 
   private makeQuestioned(): void {
-    this.isFlaged = false;
-    this.podVoprosikom = true;
-    this.element.classList.remove("flaged");
-    this.element.classList.add("questioned");
+    this.state.makeQuestioned();
+    this.removeClass("flaged");
+    this.addClass("questioned");
     this.emit("flag", [this.row, this.column, "question"]);
   }
 
   private clear(): void {
-    this.podVoprosikom = false;
-    this.element.classList.remove("questioned", "flaged");
+    this.state.clear();
+    this.removeClass("questioned", "flaged");
   }
 
-  public open(): void {
-    this.isOpen = true;
-    this.element.textContent = `${this.bombsAround.length}`;
-    this.element.style.color = this.getColor();
-    this.element.classList.add("opened");
+  public open = (): void => {
+    this.state.open();
+    this.setTextContent(`${this.bombsAround.length}`);
+    this.stylize("color", this.getColor());
+    this.addClass("opened");
     this.emit("open");
-  }
+  };
 
   private addListeners(): void {
-    this.element.onclick = this.open.bind(this);
-    this.element.oncontextmenu = this.rightClickMechanic.bind(this);
+    this.addEvent("click", this.open);
+    this.removeEvent("click", this.rightClickMechanic);
   }
 
   private getColor(): string {

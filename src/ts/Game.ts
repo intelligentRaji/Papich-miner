@@ -13,7 +13,7 @@ export class Game extends BaseComponent {
     this.miner = new Miner({
       parent: this.element,
     });
-    this.miner.element.onclick = this.gameStart.bind(this);
+    this.miner.addEvent("click", this.gameStart);
     this.miner.subscribe("plantBombs", this.addBomb.bind(this));
     this.miner.fields.forEach((row) =>
       row.forEach((cell) =>
@@ -24,11 +24,11 @@ export class Game extends BaseComponent {
     );
   }
 
-  private gameStart(e: Event): void {
+  private gameStart = (e: Event): void => {
     if (e.target instanceof HTMLButtonElement) {
       this.miner.startGame(e.target);
     }
-  }
+  };
 
   public addBomb(element: Cell): void {
     this.bombs.push(element);
@@ -37,6 +37,5 @@ export class Game extends BaseComponent {
 
   public minusCell(): void {
     this.cellsLeft -= 1;
-    console.log(this.cellsLeft);
   }
 }
