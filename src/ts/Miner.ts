@@ -6,16 +6,18 @@ interface MinerConstructor {
   parent: HTMLElement;
 }
 
+type OpenMode = "flag" | "question" | "open" | "bomb";
+
 export class Miner extends BaseComponent {
   public readonly fields: Cell[][];
   private readonly size: number;
 
   constructor({ parent }: MinerConstructor) {
     super({ tag: "div", className: "miner", parent });
-    this.size = 10;
+    this.size = 15;
     this.fields = this.getCells();
-    this.stylize("gridTemplateColumns", "repeat(10, 1fr)");
-    this.stylize("gridTemplateRows", "repeat(10, 1fr)");
+    this.stylize("gridTemplateColumns", `repeat(${this.size}, 1fr)`);
+    this.stylize("gridTemplateRows", `repeat(${this.size}, 1fr)`);
   }
 
   private getCells(): Cell[][] {
@@ -23,10 +25,15 @@ export class Miner extends BaseComponent {
       Array.from({ length: this.size }, (q, j) => {
         const element = new Cell({
           parent: this.element,
-          className: `cell ${i * 10 + j}`,
+          className: `cell ${i * this.size + j}`,
           coordinates: { i, j },
         });
-        element.subscribe("flag", this.RightClickMechanic.bind(this));
+        element.subscribe("flag", this.calculations.bind(this));
+        element.subscribe(
+          "open",
+          (row: number, column: number, mode: OpenMode) =>
+            this.calculations(row, column, mode)
+        );
         return element;
       })
     );
@@ -34,13 +41,13 @@ export class Miner extends BaseComponent {
 
   private plantBombs(numberOfBombs: number, index: number): void {
     let counter = 0;
-    const indexI = Math.floor(index / 10);
-    const indexJ = index % 10;
+    const indexI = Math.floor(index / this.size);
+    const indexJ = index % this.size;
+    const element = this.fields[indexI][indexJ];
     while (counter !== numberOfBombs) {
-      const number = getRandomNumber(0, this.size * this.size - 1);
-      const i = Math.floor(number / 10);
-      const j = number % 10;
-      const bombField = this.fields[i][j];
+      const i = getRandomNumber(0, this.size - 1);
+      const j = getRandomNumber(0, this.size - 1);
+      const bombCell = this.fields[i][j];
       if (
         !(
           i >= indexI - 1 &&
@@ -48,41 +55,18 @@ export class Miner extends BaseComponent {
           j >= indexJ - 1 &&
           j <= indexJ + 1
         ) &&
-        !bombField.state.isBomb
+        !bombCell.state.isBomb
       ) {
-        bombField.state.RezanskiSahar();
-        bombField.stylize("backgroundColor", "red");
-        if (bombField.bombsAround.length !== 0) {
-          bombField.bombsAround = [];
-        }
-        this.emit("plantBombs", bombField);
-        this.calculateBombsAround(bombField, i, j);
+        bombCell.state.RezanskiSahar();
+        this.emit("plantBombs", bombCell);
+        this.calculations(i, j, "bomb");
         counter += 1;
       }
     }
+    element.openCell(true);
   }
 
-  private calculateBombsAround(element: Cell, i: number, j: number): void {
-    for (let x = i - 1; x <= i + 1; x += 1) {
-      for (let y = j - 1; y <= j + 1; y += 1) {
-        if (
-          x >= 0 &&
-          x < this.fields.length &&
-          y >= 0 &&
-          y < this.fields.length &&
-          !this.fields[x][y].state.isBomb
-        ) {
-          this.fields[x][y].addBomb(element);
-        }
-      }
-    }
-  }
-
-  public RightClickMechanic(
-    i: number,
-    j: number,
-    mode: "flag" | "question"
-  ): void {
+  public calculations(i: number, j: number, mode: OpenMode): void {
     for (let x = i - 1; x <= i + 1; x += 1) {
       for (let y = j - 1; y <= j + 1; y += 1) {
         if (
@@ -91,20 +75,61 @@ export class Miner extends BaseComponent {
           y >= 0 &&
           y < this.fields.length
         ) {
-          if (mode === "flag") {
-            this.fields[x][y].falgsAround += 1;
-          }
-          if (mode === "question") {
-            this.fields[x][y].falgsAround -= 1;
+          const element = this.fields[x][y];
+          switch (mode) {
+            case "bomb":
+              element.addBomb();
+              break;
+
+            case "flag":
+              element.addToFlagsAround();
+              break;
+
+            case "question":
+              element.removeFromFlagsAround();
+              break;
+
+            case "open":
+              this.openCell(element);
+              break;
+
+            default:
+              break;
           }
         }
       }
     }
   }
 
+  private openCell(element: Cell): void {
+    if (!element.state.isFlaged && !element.state.podVoprosikom) {
+      if (!element.state.isBomb) {
+        if (element.bombsAround === 0) {
+          element.openCell();
+        }
+        if (element.bombsAround > 0) {
+          element.openCell(false);
+        }
+      }
+      if (element.state.isBomb) {
+        element.openBomb();
+      }
+    }
+  }
+
   public startGame(element: HTMLElement): void {
     const index = Number(element.className.split(" ")[1]);
-    this.plantBombs(10, index);
+    this.plantBombs(40, index);
     this.element.onclick = null;
+    this.fields.forEach((row) =>
+      row.forEach((cell) => {
+        cell.addEvent("click", () => {
+          cell.openMechanic();
+        });
+        cell.addEvent("contextmenu", (e) => {
+          cell.rightClickMechanic(e);
+        });
+      })
+    );
   }
 }

@@ -13,8 +13,8 @@ interface FieldConstructor {
 export class Cell extends BaseComponent {
   public readonly row: number;
   public readonly column: number;
-  public bombsAround: Cell[] = [];
-  public falgsAround: number = 0;
+  public bombsAround: number = 0;
+  public flagsAround: number = 0;
   public state: CellState;
 
   constructor({ parent, className, coordinates }: FieldConstructor) {
@@ -24,18 +24,17 @@ export class Cell extends BaseComponent {
     this.state = new CellState();
   }
 
-  public addBomb(bomb: Cell): void {
-    this.bombsAround.push(bomb);
+  public addBomb(): void {
+    this.bombsAround += 1;
   }
 
-  public rightClickMechanic = (): void => {
+  public rightClickMechanic = (e: Event): void => {
+    e.preventDefault();
     if (this.state.podVoprosikom) {
-      this.clear();
-    }
-    if (this.state.isFlaged) {
+      this.close();
+    } else if (this.state.isFlaged) {
       this.makeQuestioned();
-    }
-    if (!this.state.isFlaged && !this.state.podVoprosikom) {
+    } else if (this.state.isClosed) {
       this.hoistFlag();
     }
   };
@@ -43,36 +42,80 @@ export class Cell extends BaseComponent {
   private hoistFlag(): void {
     this.state.hoistFlag();
     this.addClass("flaged");
-    this.emit("flag", [this.row, this.column, "flag"]);
+    this.emit("addFlag");
+    this.emit("flag", this.row, this.column, "flag");
   }
 
   private makeQuestioned(): void {
     this.state.makeQuestioned();
     this.removeClass("flaged");
     this.addClass("questioned");
-    this.emit("flag", [this.row, this.column, "question"]);
+    this.emit("removeFlag");
+    this.emit("flag", this.row, this.column, "question");
   }
 
-  private clear(): void {
-    this.state.clear();
-    this.removeClass("questioned", "flaged");
+  private close(): void {
+    this.state.close();
+    this.removeClass("questioned");
   }
 
-  public open = (): void => {
-    this.state.open();
-    this.setTextContent(`${this.bombsAround.length}`);
-    this.stylize("color", this.getColor());
-    this.addClass("opened");
-    this.emit("open");
+  public openMechanic = (): void => {
+    if (!this.state.isFlaged && !this.state.podVoprosikom) {
+      if (!this.state.isBomb) {
+        this.openCell();
+      }
+      if (this.state.isBomb) {
+        this.openBomb();
+      }
+    }
   };
 
-  private addListeners(): void {
-    this.addEvent("click", this.open);
-    this.removeEvent("click", this.rightClickMechanic);
+  public openBomb(): void {
+    this.addClass("opened-bomb");
+    this.emit("endGame", this.element);
+  }
+
+  public openBombAutomaticly(): void {
+    this.addClass("bomb");
+  }
+
+  public openFlagAutomaticly(): void {
+    this.addClass("missed");
+  }
+
+  public openCell(mode = true): void {
+    if (this.flagsAround <= this.bombsAround) {
+      if (this.state.isOpen === 0) {
+        this.state.open();
+        if (this.bombsAround > 0) {
+          this.setTextContent(`${this.bombsAround}`);
+          this.stylize("color", this.getColor());
+          this.stylize("fontSize", `${this.element.clientWidth / 2}px`);
+        }
+        this.addClass("opened");
+        this.emit("minus");
+      }
+      if (
+        this.state.isOpen === 1 &&
+        this.bombsAround <= this.flagsAround &&
+        mode
+      ) {
+        this.state.open();
+        this.emit("open", this.row, this.column, "open");
+      }
+    }
+  }
+
+  public addToFlagsAround(): void {
+    this.flagsAround += 1;
+  }
+
+  public removeFromFlagsAround(): void {
+    this.flagsAround -= 1;
   }
 
   private getColor(): string {
-    switch (this.bombsAround.length) {
+    switch (this.bombsAround) {
       case 1:
         return "blue";
 

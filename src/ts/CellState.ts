@@ -1,10 +1,12 @@
 export class CellState {
   public isBomb = false;
-  public isOpen = false;
+  public isOpen = 0;
   public isFlaged = false;
   public podVoprosikom = false;
+  public isClosed = true;
 
   public hoistFlag(): void {
+    this.isClosed = false;
     this.isFlaged = true;
   }
 
@@ -13,14 +15,20 @@ export class CellState {
     this.podVoprosikom = true;
   }
 
-  public clear(): void {
+  public close(): void {
     this.podVoprosikom = false;
+    this.isClosed = true;
   }
 
   public open(): void {
-    this.isOpen = true;
-    this.isFlaged = false;
-    this.podVoprosikom = false;
+    if (this.isOpen === 0) {
+      this.isOpen = 1;
+      this.isFlaged = false;
+      this.podVoprosikom = false;
+      this.isClosed = false;
+    } else {
+      this.isOpen = 2;
+    }
   }
 
   public RezanskiSahar(): void {

@@ -14,9 +14,54 @@
 .cell {
   background-color: #fff4f4;
   border-radius: 5px;
-  border: 2px solid #384c59;
+  border: 1px solid #384c59;
+  font-weight: 1000;
+  font-size: 50%;
+  transition: all 0.1s ease 0s;
 }
 
-.open {
-  border-color: darkblue;
+.cell:hover {
+  background-color: #dbdada;
+}
+
+.flaged:hover,
+.questioned:hover,
+.bomb:hover,
+.missed:hover {
+  background-color: #fff4f4;
+}
+
+.opened-bomb:hover {
+  background-color: #ff6262;
+}
+
+.opened {
+  background-color: #dbdada;
+  box-shadow: inset 3px 3px 2px rgba(0, 0, 0, 0.5);
+}
+
+.flaged {
+  background-image: url("../assets/svg/flag.svg");
+  background-size: cover;
+}
+
+.questioned {
+  background-image: url("../assets/svg/question.svg");
+  background-size: cover;
+}
+
+.opened-bomb {
+  background-color: #ff6262;
+  background-image: url("../assets/svg/bomb.svg");
+  background-size: cover;
+}
+
+.bomb {
+  background-image: url("../assets/svg/bomb.svg");
+  background-size: cover;
+}
+
+.missed {
+  background-image: url("../assets/svg/miss.svg");
+  background-size: cover;
 }
