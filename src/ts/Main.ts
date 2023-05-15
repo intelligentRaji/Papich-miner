@@ -1,5 +1,4 @@
 import { Game } from "./Game";
-import { Miner } from "./Miner";
 import { BaseComponent } from "./components/BaseComponent";
 
 export class Main extends BaseComponent {
