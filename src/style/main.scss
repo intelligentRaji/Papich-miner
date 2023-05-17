@@ -1,17 +1,33 @@
 .main {
-  width: 500px;
   margin: 0 auto;
   margin-top: 175px;
+  max-width: 1280px;
+  padding: 0 40px;
+}
+
+.game {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-grid;
+  grid-template-columns: 500px 350px;
+  grid-template-areas:
+    "a b"
+    "c b";
+  row-gap: 20px;
+  column-gap: 100px;
 }
 
 .information-panel {
-  margin-bottom: 20px;
+  grid-area: a;
   font-size: 30px;
   display: flex;
   justify-content: space-between;
 }
 
 .miner {
+  grid-area: c;
   height: 500px;
   display: grid;
   background: #384c59;

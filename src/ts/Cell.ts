@@ -61,6 +61,7 @@ export class Cell extends BaseComponent {
 
   public openMechanic = (): void => {
     if (!this.state.isFlaged && !this.state.podVoprosikom) {
+      this.emit("addClick");
       if (!this.state.isBomb) {
         this.openCell();
       }

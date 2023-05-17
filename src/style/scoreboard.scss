@@ -1,0 +1,29 @@
+.scoreboard {
+  grid-area: b;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scoreboard-information {
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  height: 40px;
+  border-bottom: 1px solid #000;
+  font-size: 16px;
+}
+
+.scoreboard-scores {
+  display: flex;
+  flex-direction: column;
+}
+
+.score {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}

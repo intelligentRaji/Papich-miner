@@ -2,22 +2,33 @@ import { Miner } from "./Miner";
 import { BaseComponent } from "./components/BaseComponent";
 import { Cell } from "./Cell";
 import { InformationPanel } from "./InformationPanel";
+import { Observable } from "./Observable";
+import { Scoreboard } from "./Scoreboard";
 
 export class Game extends BaseComponent {
   public readonly miner: Miner;
   public readonly informationPanel: InformationPanel;
+  public readonly scoreboard: Scoreboard;
   public bombs!: Cell[];
   public cellsLeft = 100;
-  public bombsLeft = 0;
+  public bombsLeft = new Observable(0);
   public missedFlags: Cell[] = [];
+  public clicks = new Observable(0);
 
   constructor(parent: HTMLElement) {
     super({ parent, className: "game" });
     this.bombs = [];
     this.informationPanel = new InformationPanel(this.element);
+    this.clicks.subscribe((value) => {
+      this.informationPanel.plusClick(value);
+    });
+    this.bombsLeft.subscribe((value) => {
+      this.informationPanel.setBombsCount(value);
+    });
     this.miner = new Miner({
       parent: this.element,
     });
+    this.scoreboard = new Scoreboard(this.element);
     this.miner.addEvent("click", this.gameStart);
     this.miner.subscribe("plantBombs", this.addBomb.bind(this));
     this.miner.fields.forEach((row) =>
@@ -34,6 +45,9 @@ export class Game extends BaseComponent {
         cell.subscribe("removeFlag", () => {
           this.removeFlag(cell);
         });
+        cell.subscribe("addClick", () => {
+          this.clicks.notify((value) => value + 1);
+        });
       })
     );
   }
@@ -48,7 +62,7 @@ export class Game extends BaseComponent {
 
   public addBomb(cell: Cell): void {
     this.bombs.push(cell);
-    this.bombsLeft += 1;
+    this.bombsLeft.notify((value) => value + 1);
     this.minusCell();
   }
 
@@ -69,13 +83,11 @@ export class Game extends BaseComponent {
   }
 
   private minusBombsLeft(): void {
-    this.bombsLeft -= 1;
-    this.informationPanel.setBombsCount(this.bombsLeft);
+    this.bombsLeft.notify((value) => value - 1);
   }
 
   private plusBombsLeft(): void {
-    this.bombsLeft += 1;
-    this.informationPanel.setBombsCount(this.bombsLeft);
+    this.bombsLeft.notify((value) => value + 1);
   }
 
   public addFlag(cell: Cell): void {
@@ -95,6 +107,15 @@ export class Game extends BaseComponent {
       }
     });
     this.missedFlags.forEach((flag) => flag.openFlagAutomaticly());
-    this.informationPanel.end();
+    const time = this.informationPanel.end();
+    this.scoreboard.createScoreList({
+      bombs: this.bombsLeft.getValue(),
+      time,
+      mode: "medium",
+    });
+  }
+
+  private resetBombsCount(): void {
+    this.bombsLeft.notify(0);
   }
 }

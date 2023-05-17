@@ -29,11 +29,19 @@ export class Timer extends BaseComponent {
     }, 1000);
   }
 
-  public stop(): void {
+  public stop(): string {
     clearInterval(this.interval);
+    return this.getTime();
   }
 
   public restart(): void {
     this.setTextContent("00:00");
+  }
+
+  public getTime(): string {
+    if (this.element.textContent) {
+      return this.element.textContent;
+    }
+    return "00:00";
   }
 }

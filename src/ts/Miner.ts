@@ -44,6 +44,7 @@ export class Miner extends BaseComponent {
     const indexI = Math.floor(index / this.size);
     const indexJ = index % this.size;
     const element = this.fields[indexI][indexJ];
+    element.emit("addClick");
     while (counter !== numberOfBombs) {
       const i = getRandomNumber(0, this.size - 1);
       const j = getRandomNumber(0, this.size - 1);
@@ -58,6 +59,7 @@ export class Miner extends BaseComponent {
         !bombCell.state.isBomb
       ) {
         bombCell.state.RezanskiSahar();
+        bombCell.emit("minus");
         this.emit("plantBombs", bombCell);
         this.calculations(i, j, "bomb");
         counter += 1;
