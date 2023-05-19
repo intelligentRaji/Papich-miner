@@ -1,4 +1,19 @@
 {
-  "common": ["./audio/Оп.mp3", "./audio/Оп мизантроп.mp3"],
-  "uncommon": ["./audio/Опачки.mp3"]
+  "common": [
+    "./audio/Оп.mp3",
+    "./audio/Оп мизантроп.mp3",
+    "./audio/Опачки.mp3",
+    "./audio/ООП.mp3"
+  ],
+  "ost": ["./audio/bg_music.mp3"],
+  "flag": [
+    "./audio/я не вижу мин.mp3",
+    "./audio/Я не вижу мины.mp3",
+    "./audio/пепельница это мина.mp3"
+  ],
+  "win": ["./audio/победа.mp3"],
+  "loose": [
+    "./audio/миллион демаджа взрыв.mp3",
+    "./audio/не понял, вот щас не понял взрыв.mp3"
+  ]
 }

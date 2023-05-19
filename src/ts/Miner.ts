@@ -4,18 +4,21 @@ import { getRandomNumber } from "./utils/getRandomNumber";
 
 interface MinerConstructor {
   parent: HTMLElement;
+  numberOfBombs: number;
 }
 
 type OpenMode = "flag" | "question" | "open" | "bomb";
 
 export class Miner extends BaseComponent {
-  public readonly fields: Cell[][];
+  public readonly cells: Cell[][];
   private readonly size: number;
+  private numberOfBombs: number;
 
-  constructor({ parent }: MinerConstructor) {
+  constructor({ parent, numberOfBombs }: MinerConstructor) {
     super({ tag: "div", className: "miner", parent });
     this.size = 15;
-    this.fields = this.getCells();
+    this.numberOfBombs = numberOfBombs;
+    this.cells = this.getCells();
     this.stylize("gridTemplateColumns", `repeat(${this.size}, 1fr)`);
     this.stylize("gridTemplateRows", `repeat(${this.size}, 1fr)`);
   }
@@ -43,12 +46,12 @@ export class Miner extends BaseComponent {
     let counter = 0;
     const indexI = Math.floor(index / this.size);
     const indexJ = index % this.size;
-    const element = this.fields[indexI][indexJ];
+    const element = this.cells[indexI][indexJ];
     element.emit("addClick");
     while (counter !== numberOfBombs) {
       const i = getRandomNumber(0, this.size - 1);
       const j = getRandomNumber(0, this.size - 1);
-      const bombCell = this.fields[i][j];
+      const bombCell = this.cells[i][j];
       if (
         !(
           i >= indexI - 1 &&
@@ -59,7 +62,6 @@ export class Miner extends BaseComponent {
         !bombCell.state.isBomb
       ) {
         bombCell.state.RezanskiSahar();
-        bombCell.emit("minus");
         this.emit("plantBombs", bombCell);
         this.calculations(i, j, "bomb");
         counter += 1;
@@ -73,11 +75,11 @@ export class Miner extends BaseComponent {
       for (let y = j - 1; y <= j + 1; y += 1) {
         if (
           x >= 0 &&
-          x < this.fields.length &&
+          x < this.cells.length &&
           y >= 0 &&
-          y < this.fields.length
+          y < this.cells.length
         ) {
-          const element = this.fields[x][y];
+          const element = this.cells[x][y];
           switch (mode) {
             case "bomb":
               element.addBomb();
@@ -121,9 +123,9 @@ export class Miner extends BaseComponent {
 
   public startGame(element: HTMLElement): void {
     const index = Number(element.className.split(" ")[1]);
-    this.plantBombs(40, index);
+    this.plantBombs(this.numberOfBombs, index);
     this.element.onclick = null;
-    this.fields.forEach((row) =>
+    this.cells.forEach((row) =>
       row.forEach((cell) => {
         cell.addEvent("click", () => {
           cell.openMechanic();

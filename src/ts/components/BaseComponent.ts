@@ -52,4 +52,8 @@ export class BaseComponent<
   public removeEvent(event: string, func: (e: Event) => void): void {
     this.element.removeEventListener(event, func);
   }
+
+  public destroy(): void {
+    this.element.remove();
+  }
 }

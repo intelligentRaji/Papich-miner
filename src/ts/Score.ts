@@ -33,8 +33,4 @@ export class Score extends BaseComponent {
       text: `${mode}`,
     });
   }
-
-  public destroy(): void {
-    this.element.remove();
-  }
 }

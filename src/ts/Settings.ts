@@ -1,29 +1,25 @@
-import { BaseComponent } from "./components/BaseComponent";
+import { getLocalStorageItem } from "./utils/getLocalStorageItem";
 
-interface SettingsConstructor {
-  theme: ThemeState;
-  volume: number;
-  difficulty: string;
-}
+export class Settings {
+  private bombs: number;
+  private mode: "easy" | "medium" | "hard";
+  private ostVolume: number;
+  private effectsVolume: number;
+  private lightMode: "light" | "dark";
 
-type ThemeState = "day" | "night";
-
-class Settings {
-  #theme: ThemeState;
-  #volume: number;
-  #difficulty: string;
-
-  constructor({ theme, volume, difficulty }: SettingsConstructor) {
-    this.#theme = theme;
-    this.#volume = volume;
-    this.#difficulty = difficulty;
+  constructor() {
+    this.bombs = Number(localStorage.getItem("bombs")) || 40;
+    this.mode = getLocalStorageItem("mode") || "medium";
+    this.ostVolume = getLocalStorageItem("ostVolume") || 30;
+    this.effectsVolume = getLocalStorageItem("effectsVolume") || 30;
+    this.lightMode = getLocalStorageItem("lightMode") || "light";
   }
 
-  public get theme(): ThemeState {
-    return this.#theme;
+  public getBombs(): number {
+    return this.bombs;
   }
 
-  public set theme(value: ThemeState) {
-    this.#theme = value;
+  public setBombs(value: number): void {
+    this.bombs = value;
   }
 }

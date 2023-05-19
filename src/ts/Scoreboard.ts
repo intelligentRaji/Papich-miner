@@ -57,7 +57,7 @@ export class Scoreboard extends BaseComponent {
     }
   }
 
-  private destroy(): void {
+  private destroyAllScores(): void {
     Object.values(this.cache).forEach((score) => {
       score.destroy();
     });
@@ -103,7 +103,7 @@ export class Scoreboard extends BaseComponent {
     if (obj) {
       this.addScore(obj);
       this.removeOldScore();
-      this.destroy();
+      this.destroyAllScores();
     }
 
     const sortedArray = this.getSortedScores();

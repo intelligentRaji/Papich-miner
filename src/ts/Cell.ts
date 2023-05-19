@@ -30,6 +30,7 @@ export class Cell extends BaseComponent {
 
   public rightClickMechanic = (e: Event): void => {
     e.preventDefault();
+    this.emit("flagAudio");
     if (this.state.podVoprosikom) {
       this.close();
     } else if (this.state.isFlaged) {
@@ -39,7 +40,7 @@ export class Cell extends BaseComponent {
     }
   };
 
-  private hoistFlag(): void {
+  public hoistFlag(): void {
     this.state.hoistFlag();
     this.addClass("flaged");
     this.emit("addFlag");
@@ -85,25 +86,27 @@ export class Cell extends BaseComponent {
   }
 
   public openCell(mode = true): void {
-    if (this.flagsAround <= this.bombsAround) {
-      if (this.state.isOpen === 0) {
-        this.state.open();
-        if (this.bombsAround > 0) {
-          this.setTextContent(`${this.bombsAround}`);
-          this.stylize("color", this.getColor());
-          this.stylize("fontSize", `${this.element.clientWidth / 2}px`);
-        }
-        this.addClass("opened");
-        this.emit("minus");
+    if (this.state.isOpen === 0) {
+      // if (this.flagsAround <= this.bombsAround) {
+      this.emit("openAudio");
+      this.state.open();
+      if (this.bombsAround > 0) {
+        this.setTextContent(`${this.bombsAround}`);
+        this.stylize("color", this.getColor());
+        this.stylize("fontSize", `${this.element.clientWidth / 2}px`);
       }
-      if (
-        this.state.isOpen === 1 &&
-        this.bombsAround <= this.flagsAround &&
-        mode
-      ) {
-        this.state.open();
-        this.emit("open", this.row, this.column, "open");
-      }
+      this.addClass("opened");
+      this.emit("minus");
+      this.emit("win");
+      // }
+    }
+    if (
+      this.state.isOpen === 1 &&
+      this.bombsAround <= this.flagsAround &&
+      mode
+    ) {
+      this.state.open();
+      this.emit("open", this.row, this.column, "open");
     }
   }
 
