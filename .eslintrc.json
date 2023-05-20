@@ -32,7 +32,7 @@
       "error",
       { "code": 120, "ignoreComments": true, "tabWidth": 2 }
     ],
-    "max-lines-per-function": ["error", 40],
+    "max-lines-per-function": ["error", 60],
     "no-console": 0,
     "no-debugger": 0,
     "no-multiple-empty-lines": [

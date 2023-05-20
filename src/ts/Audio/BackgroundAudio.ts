@@ -1,4 +1,4 @@
-import { AudioComponent } from "./components/AudioComponent";
+import { AudioComponent } from "../components/AudioComponent";
 
 export class BackgroundAudio extends AudioComponent {
   private runOst = (): void => {
@@ -10,7 +10,7 @@ export class BackgroundAudio extends AudioComponent {
     this.element.removeEventListener("ended", this.runOst);
   }
 
-  public end(): void {
+  public loose(): void {
     this.runTrack("loose");
     this.element.removeEventListener("ended", this.runOst);
   }

@@ -1,10 +1,12 @@
 import { Cell } from "./Cell";
+import { Mode } from "./Settings";
 import { BaseComponent } from "./components/BaseComponent";
 import { getRandomNumber } from "./utils/getRandomNumber";
 
 interface MinerConstructor {
   parent: HTMLElement;
   numberOfBombs: number;
+  mode: Mode;
 }
 
 type OpenMode = "flag" | "question" | "open" | "bomb";
@@ -14,9 +16,9 @@ export class Miner extends BaseComponent {
   private readonly size: number;
   private numberOfBombs: number;
 
-  constructor({ parent, numberOfBombs }: MinerConstructor) {
+  constructor({ parent, numberOfBombs, mode }: MinerConstructor) {
     super({ tag: "div", className: "miner", parent });
-    this.size = 15;
+    this.size = this.getSizeOfField(mode);
     this.numberOfBombs = numberOfBombs;
     this.cells = this.getCells();
     this.stylize("gridTemplateColumns", `repeat(${this.size}, 1fr)`);
@@ -135,5 +137,21 @@ export class Miner extends BaseComponent {
         });
       })
     );
+  }
+
+  private getSizeOfField(mode: string): number {
+    switch (mode) {
+      case "easy":
+        return 10;
+
+      case "medium":
+        return 15;
+
+      case "hard":
+        return 25;
+
+      default:
+        return 10;
+    }
   }
 }

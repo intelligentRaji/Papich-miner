@@ -1,10 +1,11 @@
-import { EventEmitter } from "../EventEmitter";
+import { EventEmitter } from "../behavioral/EventEmitter";
 
 export interface BaseObject {
   tag?: keyof HTMLElementTagNameMap;
   parent: HTMLElement;
   className?: string;
   text?: string;
+  type?: string;
 }
 
 export class BaseComponent<
@@ -12,7 +13,7 @@ export class BaseComponent<
 > extends EventEmitter {
   public readonly element: T;
 
-  constructor({ tag = "div", parent, className, text }: BaseObject) {
+  constructor({ tag = "div", parent, className, text, type }: BaseObject) {
     super();
     this.element = document.createElement(tag) as T;
     if (className) {
@@ -23,6 +24,11 @@ export class BaseComponent<
     }
     if (text) {
       this.element.innerHTML = text;
+    }
+    if (type) {
+      if (this.element instanceof HTMLInputElement) {
+        this.element.type = type;
+      }
     }
   }
 

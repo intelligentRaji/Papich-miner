@@ -74,7 +74,7 @@ export class Cell extends BaseComponent {
 
   public openBomb(): void {
     this.addClass("opened-bomb");
-    this.emit("endGame", this.element);
+    this.emit("loose", this.element);
   }
 
   public openBombAutomaticly(): void {

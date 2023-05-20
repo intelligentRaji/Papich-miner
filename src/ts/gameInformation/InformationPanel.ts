@@ -1,5 +1,5 @@
 import { Timer } from "./Timer";
-import { BaseComponent } from "./components/BaseComponent";
+import { BaseComponent } from "../components/BaseComponent";
 
 export class InformationPanel extends BaseComponent {
   private readonly timer: Timer;

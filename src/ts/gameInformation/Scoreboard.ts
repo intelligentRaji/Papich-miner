@@ -1,5 +1,5 @@
 import { Score } from "./Score";
-import { BaseComponent } from "./components/BaseComponent";
+import { BaseComponent } from "../components/BaseComponent";
 
 export interface IScore {
   bombs: number;

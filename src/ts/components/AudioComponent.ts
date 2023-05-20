@@ -36,4 +36,8 @@ export class AudioComponent {
     this.setSrc(typeAudio[number]);
     this.play();
   }
+
+  public changeVolume(value: number): void {
+    this.element.volume = value / 100;
+  }
 }

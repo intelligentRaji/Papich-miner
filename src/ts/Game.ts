@@ -1,12 +1,13 @@
 import { Miner } from "./Miner";
 import { BaseComponent } from "./components/BaseComponent";
 import { Cell } from "./Cell";
-import { InformationPanel } from "./InformationPanel";
-import { Observable } from "./Observable";
-import { Scoreboard } from "./Scoreboard";
-import { Settings } from "./Settings";
-import { BackgroundAudio } from "./BackgroundAudio";
-import { EffectsAudio } from "./EffectsAudio";
+import { InformationPanel } from "./gameInformation/InformationPanel";
+import { Observable } from "./behavioral/Observable";
+import { Scoreboard } from "./gameInformation/Scoreboard";
+import { Mode, Settings } from "./Settings";
+import { BackgroundAudio } from "./Audio/BackgroundAudio";
+import { EffectsAudio } from "./Audio/EffectsAudio";
+import { Controls } from "./controls/Controls";
 
 export class Game extends BaseComponent {
   public readonly settings: Settings;
@@ -15,8 +16,9 @@ export class Game extends BaseComponent {
   public readonly scoreboard: Scoreboard;
   public readonly backgroundMusic: BackgroundAudio;
   public readonly effectsAudio: EffectsAudio;
+  public readonly controls: Controls;
   public bombs!: Cell[];
-  public cellsLeft = 225;
+  public cellsLeft: number;
   public bombsLeft = new Observable(0);
   public missedFlags: Cell[] = [];
   public clicks = new Observable(0);
@@ -24,8 +26,33 @@ export class Game extends BaseComponent {
   constructor(parent: HTMLElement) {
     super({ parent, className: "game" });
     this.settings = new Settings();
+    this.controls = new Controls({
+      parent: document.body,
+      ostCallback: (value): void => {
+        this.settings.ostVolume.notify(value);
+      },
+      effectsCallback: (value): void => {
+        this.settings.effectsVolume.notify(value);
+      },
+      ostValue: String(this.settings.ostVolume.getValue()),
+      effectsValue: String(this.settings.effectsVolume.getValue()),
+      mode: this.settings.getMode(),
+    });
+    this.controls.bombsControler.subscribe("changeBombs", (value: number) => {
+      this.settings.setBombs(value);
+    });
+    this.controls.modeController.subscribe("changeMode", (value: Mode) => {
+      this.settings.setMode(value);
+    });
     this.backgroundMusic = new BackgroundAudio();
+    this.settings.ostVolume.subscribe((value) => {
+      this.backgroundMusic.changeVolume(value);
+    });
     this.effectsAudio = new EffectsAudio();
+    this.settings.effectsVolume.subscribe((value) => {
+      this.effectsAudio.changeVolume(value);
+    });
+    this.cellsLeft = this.getCellsLeft();
     this.bombs = [];
     this.informationPanel = new InformationPanel(this.element);
     this.clicks.subscribe((value) => {
@@ -37,6 +64,7 @@ export class Game extends BaseComponent {
     this.miner = new Miner({
       parent: this.element,
       numberOfBombs: this.settings.getBombs(),
+      mode: this.settings.getMode(),
     });
     this.scoreboard = new Scoreboard(this.element);
     this.miner.addEvent("click", this.gameStart);
@@ -98,20 +126,24 @@ export class Game extends BaseComponent {
     this.removeMissedFlag(cell);
   }
 
-  private endGame(cell: Cell): void {
-    this.bombs.forEach((bomb) => {
-      if (bomb !== cell && !bomb.state.isFlaged) {
-        bomb.openBombAutomaticly();
-      }
-    });
-    this.missedFlags.forEach((flag) => flag.openFlagAutomaticly());
+  private endGame(): void {
     const time = this.informationPanel.end();
     this.scoreboard.createScoreList({
       bombs: this.bombsLeft.getValue() + this.missedFlags.length,
       time,
       mode: "medium",
     });
-    this.backgroundMusic.end();
+  }
+
+  private loose(cell: Cell): void {
+    this.bombs.forEach((bomb) => {
+      if (bomb !== cell && !bomb.state.isFlaged) {
+        bomb.openBombAutomaticly();
+      }
+    });
+    this.missedFlags.forEach((flag) => flag.openFlagAutomaticly());
+    this.endGame();
+    this.backgroundMusic.loose();
   }
 
   private win(): void {
@@ -121,6 +153,7 @@ export class Game extends BaseComponent {
           bomb.hoistFlag();
         }
       });
+      this.endGame();
       this.backgroundMusic.win();
     }
   }
@@ -129,8 +162,8 @@ export class Game extends BaseComponent {
     cell.subscribe("minus", () => {
       this.minusCell();
     });
-    cell.subscribe("endGame", (element: Cell) => {
-      this.endGame(element);
+    cell.subscribe("loose", (element: Cell) => {
+      this.loose(element);
     });
     cell.subscribe("addFlag", () => {
       this.addFlag(cell);
@@ -150,5 +183,21 @@ export class Game extends BaseComponent {
     cell.subscribe("flagAudio", () => {
       this.effectsAudio.action("flag");
     });
+  }
+
+  private getCellsLeft(): number {
+    switch (this.settings.getMode()) {
+      case "easy":
+        return 100;
+
+      case "medium":
+        return 225;
+
+      case "hard":
+        return 625;
+
+      default:
+        return 100;
+    }
   }
 }

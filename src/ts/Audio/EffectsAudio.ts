@@ -1,4 +1,4 @@
-import { AudioComponent } from "./components/AudioComponent";
+import { AudioComponent } from "../components/AudioComponent";
 
 export class EffectsAudio extends AudioComponent {
   private isPlay = false;
