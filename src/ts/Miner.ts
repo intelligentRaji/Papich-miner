@@ -49,27 +49,29 @@ export class Miner extends BaseComponent {
     const indexI = Math.floor(index / this.size);
     const indexJ = index % this.size;
     const element = this.cells[indexI][indexJ];
-    element.emit("addClick");
-    while (counter !== numberOfBombs) {
-      const i = getRandomNumber(0, this.size - 1);
-      const j = getRandomNumber(0, this.size - 1);
-      const bombCell = this.cells[i][j];
-      if (
-        !(
-          i >= indexI - 1 &&
-          i <= indexI + 1 &&
-          j >= indexJ - 1 &&
-          j <= indexJ + 1
-        ) &&
-        !bombCell.state.isBomb
-      ) {
-        bombCell.state.RezanskiSahar();
-        this.emit("plantBombs", bombCell);
-        this.calculations(i, j, "bomb");
-        counter += 1;
+    if (!element.state.isFlaged && !element.state.podVoprosikom) {
+      element.emit("addClick");
+      while (counter !== numberOfBombs) {
+        const i = getRandomNumber(0, this.size - 1);
+        const j = getRandomNumber(0, this.size - 1);
+        const bombCell = this.cells[i][j];
+        if (
+          !(
+            i >= indexI - 1 &&
+            i <= indexI + 1 &&
+            j >= indexJ - 1 &&
+            j <= indexJ + 1
+          ) &&
+          !bombCell.state.isBomb
+        ) {
+          bombCell.state.RezanskiSahar();
+          this.emit("plantBombs", bombCell);
+          this.calculations(i, j, "bomb");
+          counter += 1;
+        }
       }
+      element.openCell(true);
     }
-    element.openCell(true);
   }
 
   public calculations(i: number, j: number, mode: OpenMode): void {
@@ -129,12 +131,8 @@ export class Miner extends BaseComponent {
     this.element.onclick = null;
     this.cells.forEach((row) =>
       row.forEach((cell) => {
-        cell.addEvent("click", () => {
-          cell.openMechanic();
-        });
-        cell.addEvent("contextmenu", (e) => {
-          cell.rightClickMechanic(e);
-        });
+        cell.addEvent("click", cell.openMechanic);
+        cell.addEvent("contextmenu", cell.rightClickMechanic);
       })
     );
   }

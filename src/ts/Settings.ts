@@ -2,6 +2,7 @@ import { Observable } from "./behavioral/Observable";
 import { getLocalStorageItem } from "./utils/getLocalStorageItem";
 
 export type Mode = "easy" | "medium" | "hard";
+export type LightMode = "dark" | "light";
 
 const defaultBombs = 10;
 const defaultMode = "easy";
@@ -13,7 +14,7 @@ export class Settings {
   private mode: Mode;
   public ostVolume: Observable<number>;
   public effectsVolume: Observable<number>;
-  private lightMode: "light" | "dark";
+  private lightMode: LightMode;
 
   constructor() {
     const savedBombs = getLocalStorageItem("bombs");
@@ -48,6 +49,13 @@ export class Settings {
 
   public setMode(value: Mode): void {
     this.mode = value;
-    console.log(this.mode);
+  }
+
+  public getLightMode(): LightMode {
+    return this.lightMode;
+  }
+
+  public setLightMode(): void {
+    this.lightMode = this.lightMode === "light" ? "dark" : "light";
   }
 }

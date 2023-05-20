@@ -12,7 +12,7 @@ export class EventEmitter {
     delete this.events[key];
   }
 
-  public emit(key: string, ...args: any[]): void {
+  public emit(key: string, ...args: any[]): void | any {
     this.events[key](...args);
   }
 }

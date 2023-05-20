@@ -2,7 +2,8 @@ import { BombsControler } from "./BombsControler";
 import { BaseComponent } from "../components/BaseComponent";
 import { VolumeControler } from "./VolumeControler";
 import { ModeController } from "./ModeController";
-import { Mode } from "../Settings";
+import { LightMode, Mode } from "../Settings";
+import { LightModeButton } from "./LightModeButton";
 
 export type Notify = (params: number) => void;
 
@@ -13,6 +14,7 @@ interface ContolsConstructor {
   ostValue: string;
   effectsValue: string;
   mode: Mode;
+  lightMode: LightMode;
 }
 
 export class Controls extends BaseComponent {
@@ -20,6 +22,7 @@ export class Controls extends BaseComponent {
   public readonly ostVolumeController: VolumeControler;
   public readonly effectsVolumeController: VolumeControler;
   public readonly modeController: ModeController;
+  public readonly lightModeButton: LightModeButton;
 
   constructor({
     parent,
@@ -28,6 +31,7 @@ export class Controls extends BaseComponent {
     ostValue,
     effectsValue,
     mode,
+    lightMode,
   }: ContolsConstructor) {
     super({ parent, className: "controls" });
     this.bombsControler = new BombsControler(this.element);
@@ -44,6 +48,7 @@ export class Controls extends BaseComponent {
       value: effectsValue,
     });
     this.modeController = new ModeController({ parent: this.element, mode });
+    this.lightModeButton = new LightModeButton(this.element, lightMode);
   }
 
   public getBombs(): number {

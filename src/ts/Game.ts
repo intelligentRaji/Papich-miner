@@ -4,7 +4,7 @@ import { Cell } from "./Cell";
 import { InformationPanel } from "./gameInformation/InformationPanel";
 import { Observable } from "./behavioral/Observable";
 import { Scoreboard } from "./gameInformation/Scoreboard";
-import { Mode, Settings } from "./Settings";
+import { LightMode, Mode, Settings } from "./Settings";
 import { BackgroundAudio } from "./Audio/BackgroundAudio";
 import { EffectsAudio } from "./Audio/EffectsAudio";
 import { Controls } from "./controls/Controls";
@@ -37,12 +37,16 @@ export class Game extends BaseComponent {
       ostValue: String(this.settings.ostVolume.getValue()),
       effectsValue: String(this.settings.effectsVolume.getValue()),
       mode: this.settings.getMode(),
+      lightMode: this.settings.getLightMode(),
     });
     this.controls.bombsControler.subscribe("changeBombs", (value: number) => {
       this.settings.setBombs(value);
     });
     this.controls.modeController.subscribe("changeMode", (value: Mode) => {
       this.settings.setMode(value);
+    });
+    this.controls.lightModeButton.subscribe("setLightMode", () => {
+      this.settings.setLightMode();
     });
     this.backgroundMusic = new BackgroundAudio();
     this.settings.ostVolume.subscribe((value) => {
@@ -131,8 +135,11 @@ export class Game extends BaseComponent {
     this.scoreboard.createScoreList({
       bombs: this.bombsLeft.getValue() + this.missedFlags.length,
       time,
-      mode: "medium",
+      mode: this.settings.getMode(),
     });
+    this.miner.cells.forEach((row) =>
+      row.forEach((cell) => cell.removeListeners())
+    );
   }
 
   private loose(cell: Cell): void {
@@ -200,4 +207,6 @@ export class Game extends BaseComponent {
         return 100;
     }
   }
+
+  private restart(): void {}
 }

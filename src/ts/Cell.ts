@@ -22,6 +22,7 @@ export class Cell extends BaseComponent {
     this.row = coordinates.i;
     this.column = coordinates.j;
     this.state = new CellState();
+    // this.addEvent("contextmenu", this.rightClickMechanic);
   }
 
   public addBomb(): void {
@@ -87,7 +88,6 @@ export class Cell extends BaseComponent {
 
   public openCell(mode = true): void {
     if (this.state.isOpen === 0) {
-      // if (this.flagsAround <= this.bombsAround) {
       this.emit("openAudio");
       this.state.open();
       if (this.bombsAround > 0) {
@@ -98,7 +98,6 @@ export class Cell extends BaseComponent {
       this.addClass("opened");
       this.emit("minus");
       this.emit("win");
-      // }
     }
     if (
       this.state.isOpen === 1 &&
@@ -147,5 +146,10 @@ export class Cell extends BaseComponent {
       default:
         return "";
     }
+  }
+
+  public removeListeners(): void {
+    this.removeEvent("contextmenu", this.rightClickMechanic);
+    this.removeEvent("click", this.openMechanic);
   }
 }

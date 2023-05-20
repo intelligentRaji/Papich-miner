@@ -1,9 +1,16 @@
-@import url("./main.scss");
-@import url("./normalize.scss");
-@import url("./scoreboard.scss");
-@import url("./controls.scss");
+@import "./main.scss";
+@import "./normalize.scss";
+@import "./scoreboard.scss";
+@import "./controls.scss";
+@import "./variables.scss";
 
 body {
-  background-color: grey;
+  background-image: var(--body-bg);
+  background-size: cover;
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+button {
+  min-width: 20px;
+  min-height: 20px;
 }

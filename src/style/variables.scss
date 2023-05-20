@@ -1,0 +1,9 @@
+:root {
+  --body-bg: url("../assets/img/light-theme-bg.png");
+  --scoreboard-bg: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] {
+  --body-bg: url("../assets/img/dark-theme-bg.png");
+  --scoreboard-bg: rgb(36, 68, 136);
+}
