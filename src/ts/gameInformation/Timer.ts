@@ -1,3 +1,4 @@
+import { localStorageManager } from "../LocalStorageManager";
 import { BaseComponent } from "../components/BaseComponent";
 
 declare function setInterval(
@@ -6,12 +7,15 @@ declare function setInterval(
   ...args: number[]
 ): number;
 
+const defaultTime = 0;
+
 export class Timer extends BaseComponent {
-  private seconds = 0;
+  private seconds: number;
   private interval!: number;
 
   constructor(parent: HTMLElement) {
     super({ tag: "span", className: "timer", parent, text: "00:00" });
+    this.seconds = localStorageManager.getItem("time", defaultTime);
   }
 
   private plusSecond(): void {
@@ -34,7 +38,8 @@ export class Timer extends BaseComponent {
     return this.getTime();
   }
 
-  public restart(): void {
+  public reset(): void {
+    this.seconds = 0;
     this.setTextContent("00:00");
   }
 
@@ -43,5 +48,9 @@ export class Timer extends BaseComponent {
       return this.element.textContent;
     }
     return "00:00";
+  }
+
+  public toLocalStorage(): void {
+    localStorageManager.setItem("time", this.seconds);
   }
 }

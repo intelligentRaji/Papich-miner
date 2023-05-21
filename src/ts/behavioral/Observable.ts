@@ -14,7 +14,7 @@ export class Observable<ListenerType> {
 
   public subscribe(listener: (params: ListenerType) => void): void {
     this.listeners.push(listener);
-    this.notify(this.value);
+    listener(this.value);
   }
 
   public unsubscribe(listener: (params: ListenerType) => void): void {

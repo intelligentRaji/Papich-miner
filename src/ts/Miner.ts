@@ -1,4 +1,5 @@
-import { Cell } from "./Cell";
+import { Save, Cell } from "./Cell";
+import { localStorageManager } from "./LocalStorageManager";
 import { Mode } from "./Settings";
 import { BaseComponent } from "./components/BaseComponent";
 import { getRandomNumber } from "./utils/getRandomNumber";
@@ -7,20 +8,27 @@ interface MinerConstructor {
   parent: HTMLElement;
   numberOfBombs: number;
   mode: Mode;
+  isStarted: boolean;
 }
-
 type OpenMode = "flag" | "question" | "open" | "bomb";
+export type SaveMatrix = Save[][];
 
 export class Miner extends BaseComponent {
   public readonly cells: Cell[][];
-  private readonly size: number;
+  public readonly size: number;
   private numberOfBombs: number;
 
-  constructor({ parent, numberOfBombs, mode }: MinerConstructor) {
+  constructor({ parent, numberOfBombs, mode, isStarted }: MinerConstructor) {
     super({ tag: "div", className: "miner", parent });
     this.size = this.getSizeOfField(mode);
     this.numberOfBombs = numberOfBombs;
-    this.cells = this.getCells();
+    if (isStarted) {
+      const save = localStorageManager.getItem<SaveMatrix>("cells");
+      this.cells =
+        save === null ? this.getCells() : this.getCellsFromLocalStorage(save);
+    } else {
+      this.cells = this.getCells();
+    }
     this.stylize("gridTemplateColumns", `repeat(${this.size}, 1fr)`);
     this.stylize("gridTemplateRows", `repeat(${this.size}, 1fr)`);
   }
@@ -33,22 +41,19 @@ export class Miner extends BaseComponent {
           className: `cell ${i * this.size + j}`,
           coordinates: { i, j },
         });
-        element.subscribe("flag", this.calculations.bind(this));
-        element.subscribe(
-          "open",
-          (row: number, column: number, mode: OpenMode) =>
-            this.calculations(row, column, mode)
-        );
+        this.subscribeCell(element);
         return element;
       })
     );
   }
 
-  private plantBombs(numberOfBombs: number, index: number): void {
+  private plantBombs(
+    numberOfBombs: number,
+    element: Cell,
+    indexI: number,
+    indexJ: number
+  ): void {
     let counter = 0;
-    const indexI = Math.floor(index / this.size);
-    const indexJ = index % this.size;
-    const element = this.cells[indexI][indexJ];
     if (!element.state.isFlaged && !element.state.podVoprosikom) {
       element.emit("addClick");
       while (counter !== numberOfBombs) {
@@ -112,12 +117,7 @@ export class Miner extends BaseComponent {
   private openCell(element: Cell): void {
     if (!element.state.isFlaged && !element.state.podVoprosikom) {
       if (!element.state.isBomb) {
-        if (element.bombsAround === 0) {
-          element.openCell();
-        }
-        if (element.bombsAround > 0) {
-          element.openCell(false);
-        }
+        element.openCell(element.bombsAround === 0);
       }
       if (element.state.isBomb) {
         element.openBomb();
@@ -125,19 +125,17 @@ export class Miner extends BaseComponent {
     }
   }
 
-  public startGame(element: HTMLElement): void {
-    const index = Number(element.className.split(" ")[1]);
-    this.plantBombs(this.numberOfBombs, index);
+  public startGame(element: Cell, i: number, j: number): void {
+    this.plantBombs(this.numberOfBombs, element, i, j);
     this.element.onclick = null;
     this.cells.forEach((row) =>
       row.forEach((cell) => {
         cell.addEvent("click", cell.openMechanic);
-        cell.addEvent("contextmenu", cell.rightClickMechanic);
       })
     );
   }
 
-  private getSizeOfField(mode: string): number {
+  public getSizeOfField(mode: string): number {
     switch (mode) {
       case "easy":
         return 10;
@@ -151,5 +149,37 @@ export class Miner extends BaseComponent {
       default:
         return 10;
     }
+  }
+
+  private subscribeCell(cell: Cell): void {
+    cell.subscribe("flag", this.calculations.bind(this));
+    cell.subscribe("open", (row: number, column: number, mode: OpenMode) =>
+      this.calculations(row, column, mode)
+    );
+  }
+
+  public getCellsFromLocalStorage(save: SaveMatrix): Cell[][] {
+    return Array.from(save, (row1, i) =>
+      row1.map((cell, j) => {
+        const element = new Cell({
+          parent: this.element,
+          className: `cell ${i * this.size + j}`,
+          coordinates: { i, j },
+          save: cell,
+        });
+        if (cell.state.isBomb) {
+          this.emit("plantBombs", element);
+        }
+        this.subscribeCell(element);
+        return element;
+      })
+    );
+  }
+
+  public toLocalStorage(): void {
+    const save = this.cells.map((row) =>
+      row.map((cell) => cell.toLocalStorage())
+    );
+    localStorageManager.setItem("cells", save);
   }
 }

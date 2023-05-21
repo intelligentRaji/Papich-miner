@@ -1,31 +1,44 @@
-import { Miner } from "./Miner";
+import { SaveMatrix, Miner } from "./Miner";
 import { BaseComponent } from "./components/BaseComponent";
 import { Cell } from "./Cell";
 import { InformationPanel } from "./gameInformation/InformationPanel";
 import { Observable } from "./behavioral/Observable";
 import { Scoreboard } from "./gameInformation/Scoreboard";
-import { LightMode, Mode, Settings } from "./Settings";
+import { Mode, Settings } from "./Settings";
 import { BackgroundAudio } from "./Audio/BackgroundAudio";
 import { EffectsAudio } from "./Audio/EffectsAudio";
 import { Controls } from "./controls/Controls";
+import { localStorageManager } from "./LocalStorageManager";
 
 export class Game extends BaseComponent {
   public readonly settings: Settings;
-  public readonly miner: Miner;
   public readonly informationPanel: InformationPanel;
   public readonly scoreboard: Scoreboard;
   public readonly backgroundMusic: BackgroundAudio;
   public readonly effectsAudio: EffectsAudio;
   public readonly controls: Controls;
-  public bombs!: Cell[];
+  public miner: Miner;
+  public bombs: Cell[] = [];
   public cellsLeft: number;
-  public bombsLeft = new Observable(0);
+  public bombsLeft: Observable<number> = new Observable(0);
   public missedFlags: Cell[] = [];
-  public clicks = new Observable(0);
+  public clicks: Observable<number> = new Observable(0);
+  public isStarted: boolean;
 
   constructor(parent: HTMLElement) {
     super({ parent, className: "game" });
     this.settings = new Settings();
+    const defaultValues = {
+      cellsLeft: this.getCellsLeft(),
+      bombsLeft: 0,
+      isStarted: false,
+      clicks: 0,
+    };
+    const save = localStorageManager.getItem("gameState", defaultValues);
+    this.cellsLeft = save.cellsLeft;
+    this.bombsLeft = new Observable(save.bombsLeft);
+    this.clicks = new Observable(save.clicks);
+    this.isStarted = save.isStarted;
     this.controls = new Controls({
       parent: document.body,
       ostCallback: (value): void => {
@@ -38,6 +51,10 @@ export class Game extends BaseComponent {
       effectsValue: String(this.settings.effectsVolume.getValue()),
       mode: this.settings.getMode(),
       lightMode: this.settings.getLightMode(),
+      reset: (): void => {
+        this.restart();
+      },
+      numberOfBombs: this.settings.getBombs(),
     });
     this.controls.bombsControler.subscribe("changeBombs", (value: number) => {
       this.settings.setBombs(value);
@@ -56,8 +73,6 @@ export class Game extends BaseComponent {
     this.settings.effectsVolume.subscribe((value) => {
       this.effectsAudio.changeVolume(value);
     });
-    this.cellsLeft = this.getCellsLeft();
-    this.bombs = [];
     this.informationPanel = new InformationPanel(this.element);
     this.clicks.subscribe((value) => {
       this.informationPanel.plusClick(value);
@@ -69,26 +84,49 @@ export class Game extends BaseComponent {
       parent: this.element,
       numberOfBombs: this.settings.getBombs(),
       mode: this.settings.getMode(),
+      isStarted: this.isStarted,
     });
-    this.scoreboard = new Scoreboard(this.element);
-    this.miner.addEvent("click", this.gameStart);
-    this.miner.subscribe("plantBombs", this.addBomb.bind(this));
     this.miner.cells.forEach((row) =>
       row.forEach((cell) => {
         this.subscribeCell(cell);
       })
     );
+    this.miner.subscribe("plantBombs", this.addBomb.bind(this));
+    this.scoreboard = new Scoreboard(this.element);
+    this.decisionToStart();
+    this.setHardStyle(this.settings.getMode());
+  }
+
+  private decisionToStart(): void {
+    if (this.isStarted) {
+      this.continue();
+    }
+    if (!this.isStarted) {
+      this.miner.addEvent("click", this.gameStart);
+    }
   }
 
   private gameStart = (e: Event): void => {
     if (e.target instanceof HTMLButtonElement) {
-      this.miner.startGame(e.target);
+      const index = Number(e.target.className.split(" ")[1]);
+      const i = Math.floor(index / this.miner.size);
+      const j = index % this.miner.size;
+      const element = this.miner.cells[i][j];
+      if (!element.state.isFlaged && !element.state.podVoprosikom) {
+        this.miner.startGame(element, i, j);
+        this.miner.removeEvent("click", this.gameStart);
+        this.informationPanel.start();
+        this.backgroundMusic.start();
+        this.isStarted = true;
+        this.win();
+      }
     }
-    this.miner.removeEvent("click", this.gameStart);
+  };
+
+  private continue(): void {
     this.informationPanel.start();
     this.backgroundMusic.start();
-    this.win();
-  };
+  }
 
   public addBomb(cell: Cell): void {
     this.bombs.push(cell);
@@ -140,9 +178,10 @@ export class Game extends BaseComponent {
     this.miner.cells.forEach((row) =>
       row.forEach((cell) => cell.removeListeners())
     );
+    this.isStarted = false;
   }
 
-  private loose(cell: Cell): void {
+  private lose(cell: Cell): void {
     this.bombs.forEach((bomb) => {
       if (bomb !== cell && !bomb.state.isFlaged) {
         bomb.openBombAutomaticly();
@@ -170,7 +209,7 @@ export class Game extends BaseComponent {
       this.minusCell();
     });
     cell.subscribe("loose", (element: Cell) => {
-      this.loose(element);
+      this.lose(element);
     });
     cell.subscribe("addFlag", () => {
       this.addFlag(cell);
@@ -208,5 +247,52 @@ export class Game extends BaseComponent {
     }
   }
 
-  private restart(): void {}
+  private restart(): void {
+    this.isStarted = false;
+    this.cellsLeft = this.getCellsLeft();
+    this.bombs = [];
+    this.bombsLeft.notify(0);
+    this.missedFlags = [];
+    this.clicks.notify(0);
+    this.informationPanel.reset();
+    this.miner.destroy();
+    this.miner = new Miner({
+      parent: this.element,
+      numberOfBombs: this.settings.getBombs(),
+      mode: this.settings.getMode(),
+      isStarted: this.isStarted,
+    });
+    this.miner.addEvent("click", this.gameStart);
+    this.miner.subscribe("plantBombs", this.addBomb.bind(this));
+    this.miner.cells.forEach((row) =>
+      row.forEach((cell) => {
+        this.subscribeCell(cell);
+      })
+    );
+    this.setHardStyle(this.settings.getMode());
+  }
+
+  private setHardStyle(value: Mode): void {
+    if (value === "hard") {
+      this.addClass("hard");
+      this.miner.addClass("hard");
+    } else {
+      this.removeClass("hard");
+      this.miner.removeClass("hard");
+    }
+  }
+
+  public toLocalStorage(): void {
+    const gameState = {
+      cellsLeft: this.cellsLeft,
+      bombsLeft: this.bombsLeft.getValue(),
+      clicks: this.clicks.getValue(),
+      isStarted: this.isStarted,
+    };
+    localStorageManager.setItem("gameState", gameState);
+    this.settings.toLocalStorage();
+    this.informationPanel.toLocalStorage();
+    this.scoreboard.toLocalStorage();
+    this.miner.toLocalStorage();
+  }
 }

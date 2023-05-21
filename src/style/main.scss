@@ -19,6 +19,10 @@
   column-gap: 100px;
 }
 
+.game.hard {
+  grid-template-columns: 750px 350px;
+}
+
 .information-panel {
   grid-area: a;
   font-size: 30px;
@@ -32,6 +36,10 @@
   display: grid;
   background: #384c59;
   border-radius: 5px;
+}
+
+.miner.hard {
+  height: 750px;
 }
 
 .cell {

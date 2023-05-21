@@ -15,6 +15,8 @@ interface ContolsConstructor {
   effectsValue: string;
   mode: Mode;
   lightMode: LightMode;
+  reset: () => void;
+  numberOfBombs: number;
 }
 
 export class Controls extends BaseComponent {
@@ -23,6 +25,7 @@ export class Controls extends BaseComponent {
   public readonly effectsVolumeController: VolumeControler;
   public readonly modeController: ModeController;
   public readonly lightModeButton: LightModeButton;
+  public readonly resetButton: BaseComponent;
 
   constructor({
     parent,
@@ -32,9 +35,15 @@ export class Controls extends BaseComponent {
     effectsValue,
     mode,
     lightMode,
+    reset,
+    numberOfBombs,
   }: ContolsConstructor) {
     super({ parent, className: "controls" });
-    this.bombsControler = new BombsControler(this.element);
+    this.bombsControler = new BombsControler({
+      parent: this.element,
+      reset,
+      numberOfBombs,
+    });
     this.ostVolumeController = new VolumeControler({
       parent: this.element,
       className: "ost-volume",
@@ -47,8 +56,22 @@ export class Controls extends BaseComponent {
       callback: effectsCallback,
       value: effectsValue,
     });
-    this.modeController = new ModeController({ parent: this.element, mode });
+    this.modeController = new ModeController({
+      parent: this.element,
+      mode,
+      reset,
+    });
+    this.modeController.subscribe("changeBombs", (value: number) => {
+      this.bombsControler.change(value);
+    });
     this.lightModeButton = new LightModeButton(this.element, lightMode);
+    this.resetButton = new BaseComponent({
+      parent: this.element,
+      tag: "button",
+      text: "Начать заново",
+      className: "reset-button",
+    });
+    this.resetButton.addEvent("click", reset);
   }
 
   public getBombs(): number {

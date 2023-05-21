@@ -1,5 +1,6 @@
 import { Score } from "./Score";
 import { BaseComponent } from "../components/BaseComponent";
+import { localStorageManager } from "../LocalStorageManager";
 
 export interface IScore {
   bombs: number;
@@ -20,8 +21,8 @@ export class Scoreboard extends BaseComponent {
 
   constructor(parent: HTMLElement) {
     super({ parent, className: "scoreboard" });
-    this.scoresArray = [];
     this.cache = new Map();
+    this.scoresArray = localStorageManager.getItem("scoreboard", []);
     this.scoreboardInfrmation = new BaseComponent({
       parent: this.element,
       className: "scoreboard-information",
@@ -53,12 +54,15 @@ export class Scoreboard extends BaseComponent {
 
   private removeOldScore(): void {
     if (this.scoresArray.length > 10) {
+      this.cache.delete(this.scoresArray[0]);
       this.scoresArray.shift();
     }
   }
 
   private destroyAllScores(): void {
-    Object.values(this.cache).forEach((score) => {
+    [...this.cache.values()].forEach((score) => {
+      console.log(this.cache);
+      console.log(this.scoresArray);
       score.destroy();
     });
   }
@@ -70,10 +74,10 @@ export class Scoreboard extends BaseComponent {
   private getSortedScores(): IScore[] {
     return this.scoresArray.sort((a, b) => {
       if (a.bombs < b.bombs) {
-        return 1;
+        return -1;
       }
       if (a.bombs > b.bombs) {
-        return -1;
+        return 1;
       }
 
       const difficulty = {
@@ -82,17 +86,19 @@ export class Scoreboard extends BaseComponent {
         easy: 0,
       };
       if (difficulty[a.mode] > difficulty[b.mode]) {
-        return 1;
+        return -1;
       }
       if (difficulty[a.mode] < difficulty[b.mode]) {
-        return -1;
-      }
-
-      if (Number(a.time) < Number(b.time)) {
         return 1;
       }
-      if (Number(a.time) > Number(b.time)) {
+
+      const aTime = a.time.replace(":", "");
+      const bTime = b.time.replace(":", "");
+      if (Number(aTime) < Number(bTime)) {
         return -1;
+      }
+      if (Number(aTime) > Number(bTime)) {
+        return 1;
       }
 
       return 0;
@@ -102,8 +108,8 @@ export class Scoreboard extends BaseComponent {
   public createScoreList(obj?: IScore): void {
     if (obj) {
       this.addScore(obj);
-      this.removeOldScore();
       this.destroyAllScores();
+      this.removeOldScore();
     }
 
     const sortedArray = this.getSortedScores();
@@ -123,5 +129,9 @@ export class Scoreboard extends BaseComponent {
         this.cache.set(item, element);
       }
     });
+  }
+
+  public toLocalStorage(): void {
+    localStorageManager.setItem("scoreboard", this.scoresArray);
   }
 }

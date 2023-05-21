@@ -7,19 +7,20 @@ export class LightModeButton extends BaseComponent {
   constructor(parent: HTMLElement, mode: LightMode) {
     super({ tag: "button", className: "lightmode-button", parent });
     this.lightMode = mode;
+    this.changeLightMode();
     this.addEvent("click", () => {
-      this.changeLightMode();
+      this.action();
     });
   }
 
-  public changeLightMode(): void {
+  public action(): void {
     this.emit("setLightMode");
-    if (this.lightMode === "dark") {
-      document.documentElement.setAttribute("data-theme", "dark");
-    } else {
-      document.documentElement.setAttribute("data-theme", "light");
-    }
     this.setLightMode();
+    this.changeLightMode();
+  }
+
+  private changeLightMode(): void {
+    document.documentElement.setAttribute("data-theme", `${this.lightMode}`);
   }
 
   private setLightMode(): void {

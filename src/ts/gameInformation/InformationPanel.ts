@@ -38,4 +38,12 @@ export class InformationPanel extends BaseComponent {
   public end(): string {
     return this.timer.stop();
   }
+
+  public reset(): void {
+    this.timer.reset();
+  }
+
+  public toLocalStorage(): void {
+    this.timer.toLocalStorage();
+  }
 }

@@ -5,6 +5,7 @@ import { Option } from "../components/Option";
 interface IModeController {
   parent: HTMLElement;
   mode: Mode;
+  reset: () => void;
 }
 
 export class ModeController extends BaseComponent<HTMLSelectElement> {
@@ -14,7 +15,7 @@ export class ModeController extends BaseComponent<HTMLSelectElement> {
     hard: "Нарисовать звезду (сложно)",
   };
 
-  constructor({ parent, mode }: IModeController) {
+  constructor({ parent, mode, reset }: IModeController) {
     super({ tag: "select", parent, className: "mode-controller" });
     Object.entries(this.mods).forEach((item) => {
       if (item[0] === mode) {
@@ -35,6 +36,17 @@ export class ModeController extends BaseComponent<HTMLSelectElement> {
     });
     this.addEvent("change", () => {
       this.emit("changeMode", this.getValue());
+      const gameMode = this.getValue();
+      if (gameMode === "medium") {
+        this.emit("changeBombs", 40);
+      }
+      if (gameMode === "hard") {
+        this.emit("changeBombs", 99);
+      }
+      if (gameMode === "easy") {
+        this.emit("changeBombs", 10);
+      }
+      reset();
     });
   }
 

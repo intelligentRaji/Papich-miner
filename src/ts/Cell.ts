@@ -1,5 +1,11 @@
-import { CellState } from "./CellState";
+import { IProps, CellState } from "./CellState";
 import { BaseComponent } from "./components/BaseComponent";
+
+export interface Save {
+  bombsAround: number;
+  flagsAround: number;
+  state: IProps;
+}
 
 interface FieldConstructor {
   parent: HTMLElement;
@@ -8,21 +14,41 @@ interface FieldConstructor {
     i: number;
     j: number;
   };
+  save?: Save;
 }
+
+const defaultSettings: Save = {
+  bombsAround: 0,
+  flagsAround: 0,
+  state: {
+    isBomb: false,
+    isOpen: 0,
+    isFlaged: false,
+    podVoprosikom: false,
+    isClosed: true,
+  },
+};
 
 export class Cell extends BaseComponent {
   public readonly row: number;
   public readonly column: number;
-  public bombsAround: number = 0;
-  public flagsAround: number = 0;
+  public bombsAround: number;
+  public flagsAround: number;
   public state: CellState;
 
-  constructor({ parent, className, coordinates }: FieldConstructor) {
+  constructor({
+    parent,
+    className,
+    coordinates,
+    save = defaultSettings,
+  }: FieldConstructor) {
     super({ tag: "button", className, parent });
+    this.bombsAround = save.bombsAround;
+    this.flagsAround = save.flagsAround;
     this.row = coordinates.i;
     this.column = coordinates.j;
-    this.state = new CellState();
-    // this.addEvent("contextmenu", this.rightClickMechanic);
+    this.state = new CellState(save.state);
+    this.addEvent("contextmenu", this.rightClickMechanic);
   }
 
   public addBomb(): void {
@@ -32,6 +58,7 @@ export class Cell extends BaseComponent {
   public rightClickMechanic = (e: Event): void => {
     e.preventDefault();
     this.emit("flagAudio");
+    console.log(this.state.isClosed);
     if (this.state.podVoprosikom) {
       this.close();
     } else if (this.state.isFlaged) {
@@ -151,5 +178,13 @@ export class Cell extends BaseComponent {
   public removeListeners(): void {
     this.removeEvent("contextmenu", this.rightClickMechanic);
     this.removeEvent("click", this.openMechanic);
+  }
+
+  public toLocalStorage(): Save {
+    return {
+      bombsAround: this.bombsAround,
+      flagsAround: this.flagsAround,
+      state: this.state.toLocalStorage(),
+    };
   }
 }
