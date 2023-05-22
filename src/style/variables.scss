@@ -1,9 +1,29 @@
 :root {
   --body-bg: url("../assets/img/light-theme-bg.png");
-  --scoreboard-bg: rgba(255, 255, 255, 0.5);
+  --scoreboard-bg: #f6fdff;
+  --orange: #ffd381;
+  --dark: #3d3d3d;
+  --white: #e7e7e7;
+  --trasparent-white: rgba(255, 255, 255, 0.6);
+  --grey: #cecece;
+  --full-white: #fff;
+  --full-dark: #000;
+  --cell: #f1f1f1;
+  --cell-opened: #dbdada;
+  --field: #384c59;
+  --modal: #ffffff79;
 }
 
 [data-theme="dark"] {
   --body-bg: url("../assets/img/dark-theme-bg.png");
   --scoreboard-bg: rgb(36, 68, 136);
+  --dark: #e7e7e7;
+  --white: #3d3d3d;
+  --full-white: #3d3d3d;
+  --full-dark: #e7e7e7;
+  --trasparent-white: rgba(0, 0, 0, 0.8);
+  --grey: #636363;
+  --cell: #888888;
+  --cell-opened: #bdbdbd;
+  --field: #000000;
 }

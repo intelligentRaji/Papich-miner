@@ -1,3 +1,4 @@
+import { localStorageManager } from "../LocalStorageManager";
 import { BaseComponent } from "./BaseComponent";
 
 type Notify = (params: number) => void;
@@ -10,7 +11,7 @@ interface IRange {
 }
 
 export class InputRange extends BaseComponent<HTMLInputElement> {
-  private isMuted = false;
+  private isMuted: boolean;
   private valueBeforeMuted!: string;
   private notify: Notify;
 
@@ -21,6 +22,14 @@ export class InputRange extends BaseComponent<HTMLInputElement> {
       notify(Number(this.getValue()));
     });
     this.setValue(value);
+    this.valueBeforeMuted = localStorageManager.getItem(
+      `valueBeforeMuted${this.getClassName()}`,
+      this.getValue()
+    );
+    this.isMuted = localStorageManager.getItem(
+      `isMuted${this.getClassName()}`,
+      false
+    );
   }
 
   public setValue(value: string): void {
@@ -42,5 +51,13 @@ export class InputRange extends BaseComponent<HTMLInputElement> {
   public unmute(): void {
     this.isMuted = false;
     this.setValue(this.valueBeforeMuted);
+  }
+
+  public toLocalStorage(): void {
+    localStorageManager.setItem(
+      `valueBeforeMuted${this.getClassName()}`,
+      this.valueBeforeMuted
+    );
+    localStorageManager.setItem(`isMuted${this.getClassName()}`, this.isMuted);
   }
 }

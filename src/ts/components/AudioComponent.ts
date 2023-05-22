@@ -40,4 +40,8 @@ export class AudioComponent {
   public changeVolume(value: number): void {
     this.element.volume = value / 100;
   }
+
+  public stop(): void {
+    this.element.pause();
+  }
 }

@@ -10,7 +10,7 @@ export class BackgroundAudio extends AudioComponent {
     this.element.removeEventListener("ended", this.runOst);
   }
 
-  public loose(): void {
+  public lose(): void {
     this.runTrack("loose");
     this.element.removeEventListener("ended", this.runOst);
   }

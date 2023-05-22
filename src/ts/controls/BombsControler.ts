@@ -24,7 +24,11 @@ export class BombsControler extends BaseComponent<HTMLInputElement> {
   }
 
   public setValue(value: number = this.getValue()): void {
-    this.element.value = String(value);
+    if (value < 10) {
+      this.element.value = "10";
+    } else {
+      this.element.value = String(value);
+    }
   }
 
   public change(value?: number): void {

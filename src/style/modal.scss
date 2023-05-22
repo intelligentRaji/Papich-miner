@@ -1,0 +1,45 @@
+@import "./variables.scss";
+@import "./shablony.scss";
+
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.7;
+}
+
+.modal {
+  padding: 0px 40px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: flex;
+  background-color: var(--modal);
+  width: 500px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+}
+
+.modal-text {
+  font-family: "Jost";
+  font-weight: bold;
+  font-size: 24px;
+  margin-bottom: 40px;
+  text-align: center;
+  color: var(--dark);
+}
+
+.modal-button {
+  @extend %button;
+  padding: 10px 20px;
+  border-radius: 5px;
+}

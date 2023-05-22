@@ -1,6 +1,7 @@
 import { Score } from "./Score";
 import { BaseComponent } from "../components/BaseComponent";
 import { localStorageManager } from "../LocalStorageManager";
+import { Mode } from "../Settings";
 
 export interface IScore {
   bombs: number;
@@ -61,8 +62,6 @@ export class Scoreboard extends BaseComponent {
 
   private destroyAllScores(): void {
     [...this.cache.values()].forEach((score) => {
-      console.log(this.cache);
-      console.log(this.scoresArray);
       score.destroy();
     });
   }
@@ -72,7 +71,7 @@ export class Scoreboard extends BaseComponent {
   }
 
   private getSortedScores(): IScore[] {
-    return this.scoresArray.sort((a, b) => {
+    return this.scoresArray.slice().sort((a, b) => {
       if (a.bombs < b.bombs) {
         return -1;
       }
@@ -105,6 +104,22 @@ export class Scoreboard extends BaseComponent {
     });
   }
 
+  private getDifficultyName(mode: Mode): string {
+    switch (mode) {
+      case "easy":
+        return "СЛОЖНЫЙ";
+
+      case "medium":
+        return "РЕЗИДЕНТ ГЛОБУС 4";
+
+      case "hard":
+        return "9 КЛАСС";
+
+      default:
+        return "";
+    }
+  }
+
   public createScoreList(obj?: IScore): void {
     if (obj) {
       this.addScore(obj);
@@ -124,7 +139,7 @@ export class Scoreboard extends BaseComponent {
           parent: this.scores.element,
           bombs: item.bombs,
           time: item.time,
-          mode: item.mode,
+          mode: this.getDifficultyName(item.mode),
         });
         this.cache.set(item, element);
       }

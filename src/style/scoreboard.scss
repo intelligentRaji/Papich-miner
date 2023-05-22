@@ -2,21 +2,37 @@
 
 .scoreboard {
   grid-area: b;
-  background-color: var(--scoreboard-bg);
+  background-color: var(--white);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
+  border: 2px solid var(--full-dark);
+  color: var(--dark);
+  height: 438px;
+  overflow-y: scroll;
 }
 
 .scoreboard-information {
   padding: 0 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
-  height: 40px;
-  border-bottom: 1px solid #000;
+  justify-content: center;
+  align-items: center;
+  grid-auto-rows: 40px;
+  border-bottom: 2px solid var(--dark);
   font-size: 16px;
+}
+
+.scoreboard-bombs {
+  justify-self: start;
+}
+
+.scoreboard-time {
+  justify-self: center;
+}
+
+.scoreboard-mode {
+  justify-self: end;
 }
 
 .scoreboard-scores {
@@ -26,6 +42,25 @@
 
 .score {
   padding: 10px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  border-bottom: 1px solid var(--dark);
+}
+
+.score:last-child {
+  border: none;
+}
+
+.score-bombs {
+  justify-self: start;
+}
+
+.score-time {
+  justify-self: center;
+}
+
+.score-mode {
+  justify-self: end;
+  text-align: end;
 }

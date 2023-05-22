@@ -2,6 +2,7 @@ import { IProps, CellState } from "./CellState";
 import { BaseComponent } from "./components/BaseComponent";
 
 export interface Save {
+  className: string;
   bombsAround: number;
   flagsAround: number;
   state: IProps;
@@ -18,6 +19,7 @@ interface FieldConstructor {
 }
 
 const defaultSettings: Save = {
+  className: "",
   bombsAround: 0,
   flagsAround: 0,
   state: {
@@ -49,6 +51,9 @@ export class Cell extends BaseComponent {
     this.column = coordinates.j;
     this.state = new CellState(save.state);
     this.addEvent("contextmenu", this.rightClickMechanic);
+    if (this.bombsAround > 0 && this.state.isOpen) {
+      this.stylizeCommonCell();
+    }
   }
 
   public addBomb(): void {
@@ -58,7 +63,6 @@ export class Cell extends BaseComponent {
   public rightClickMechanic = (e: Event): void => {
     e.preventDefault();
     this.emit("flagAudio");
-    console.log(this.state.isClosed);
     if (this.state.podVoprosikom) {
       this.close();
     } else if (this.state.isFlaged) {
@@ -71,7 +75,7 @@ export class Cell extends BaseComponent {
   public hoistFlag(): void {
     this.state.hoistFlag();
     this.addClass("flaged");
-    this.emit("addFlag");
+    this.emit("addFlag", { i: this.row, j: this.column });
     this.emit("flag", this.row, this.column, "flag");
   }
 
@@ -102,7 +106,7 @@ export class Cell extends BaseComponent {
 
   public openBomb(): void {
     this.addClass("opened-bomb");
-    this.emit("loose", this.element);
+    this.emit("loose", { i: this.row, j: this.column });
   }
 
   public openBombAutomaticly(): void {
@@ -118,9 +122,7 @@ export class Cell extends BaseComponent {
       this.emit("openAudio");
       this.state.open();
       if (this.bombsAround > 0) {
-        this.setTextContent(`${this.bombsAround}`);
-        this.stylize("color", this.getColor());
-        this.stylize("fontSize", `${this.element.clientWidth / 2}px`);
+        this.stylizeCommonCell();
       }
       this.addClass("opened");
       this.emit("minus");
@@ -134,6 +136,11 @@ export class Cell extends BaseComponent {
       this.state.open();
       this.emit("open", this.row, this.column, "open");
     }
+  }
+
+  private stylizeCommonCell(): void {
+    this.setTextContent(`${this.bombsAround}`);
+    this.stylize("color", this.getColor());
   }
 
   public addToFlagsAround(): void {
@@ -182,6 +189,7 @@ export class Cell extends BaseComponent {
 
   public toLocalStorage(): Save {
     return {
+      className: this.getClassName(),
       bombsAround: this.bombsAround,
       flagsAround: this.flagsAround,
       state: this.state.toLocalStorage(),

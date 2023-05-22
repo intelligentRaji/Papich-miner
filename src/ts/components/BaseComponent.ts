@@ -40,6 +40,10 @@ export class BaseComponent<
     this.element.classList.remove(...classes);
   }
 
+  public getClassName(): string {
+    return this.element.className;
+  }
+
   public setTextContent(text: string): void {
     this.element.textContent = text;
   }

@@ -1,11 +1,139 @@
+@import "./variables.scss";
+@import "./shablony.scss";
+
 .controls {
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  height: 100px;
+  background-color: var(--trasparent-white);
+  font-size: 20px;
+  transition: all 0.3s ease 0s;
 }
 
 .bombs-controler {
-  width: 2ch;
+  border: 2px solid var(--full-white);
+  border-radius: 5px;
+  background-color: var(--full-white);
+  width: 35px;
+  text-align: center;
+  color: var(--full-dark);
+  border: 2px solid var(--full-dark);
+}
+
+.bombs-text {
+  color: var(--full-dark);
+}
+
+.controls .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+}
+
+.bombs-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.volume-button {
+  border: none;
+  background-color: transparent;
+  background-image: url("../assets/svg/volume-light.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 35px;
+  height: 25px;
+  transition: all 0.3s ease 0s;
+}
+
+.range {
+  cursor: pointer;
+}
+
+.volume-button:hover {
+  transform: scale(1.1);
+}
+
+.volume-button.muted {
+  background-image: url("../assets/svg/volume-off-light.png");
+}
+
+.mode-controller {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  background-color: var(--full-white);
+  color: var(--full-dark);
+  outline: none;
+}
+
+.mode-controller:hover {
+  background: var(--grey);
+}
+
+.lightmode-button {
+  width: 35px;
+  height: 35px;
+  border: none;
+  background-color: transparent;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url("../assets/svg/light-mode.svg");
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+}
+
+.lightmode-button:hover {
+  transform: scale(1.1);
+}
+
+.reset-button {
+  border-radius: 5px;
+  border: 2px solid var(--full-dark);
+  cursor: pointer;
+  background-color: var(--full-white);
+  color: var(--full-dark);
+}
+
+[data-theme="dark"] {
+  .volume-button {
+    background-image: url("../assets/svg/volume.svg");
+  }
+
+  .volume-button.muted {
+    background-image: url("../assets/svg/volume-off.svg");
+  }
+
+  .lightmode-button {
+    background-image: url("../assets/svg/light-mode-dark.png");
+  }
+}
+
+@media (max-width: 1100px) {
+  .controls {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+  }
+
+  .controls .container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 100px;
+    justify-content: space-between;
+    gap: 50px;
+    align-items: center;
+    height: 50px;
+  }
 }

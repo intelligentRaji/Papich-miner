@@ -4,11 +4,15 @@ import { Mode } from "./Settings";
 import { BaseComponent } from "./components/BaseComponent";
 import { getRandomNumber } from "./utils/getRandomNumber";
 
+type PlantBombs = (coordinates: { i: number; j: number }) => void;
+
 interface MinerConstructor {
   parent: HTMLElement;
   numberOfBombs: number;
   mode: Mode;
+  className: string;
   isStarted: boolean;
+  callback: PlantBombs;
 }
 type OpenMode = "flag" | "question" | "open" | "bomb";
 export type SaveMatrix = Save[][];
@@ -17,10 +21,19 @@ export class Miner extends BaseComponent {
   public readonly cells: Cell[][];
   public readonly size: number;
   private numberOfBombs: number;
+  private callback: PlantBombs;
 
-  constructor({ parent, numberOfBombs, mode, isStarted }: MinerConstructor) {
-    super({ tag: "div", className: "miner", parent });
+  constructor({
+    parent,
+    numberOfBombs,
+    mode,
+    className,
+    isStarted,
+    callback,
+  }: MinerConstructor) {
+    super({ className, parent });
     this.size = this.getSizeOfField(mode);
+    this.callback = callback;
     this.numberOfBombs = numberOfBombs;
     if (isStarted) {
       const save = localStorageManager.getItem<SaveMatrix>("cells");
@@ -60,19 +73,25 @@ export class Miner extends BaseComponent {
         const i = getRandomNumber(0, this.size - 1);
         const j = getRandomNumber(0, this.size - 1);
         const bombCell = this.cells[i][j];
-        if (
-          !(
-            i >= indexI - 1 &&
-            i <= indexI + 1 &&
-            j >= indexJ - 1 &&
-            j <= indexJ + 1
-          ) &&
-          !bombCell.state.isBomb
-        ) {
-          bombCell.state.RezanskiSahar();
-          this.emit("plantBombs", bombCell);
-          this.calculations(i, j, "bomb");
-          counter += 1;
+        if (numberOfBombs <= 90) {
+          if (
+            !(
+              i >= indexI - 1 &&
+              i <= indexI + 1 &&
+              j >= indexJ - 1 &&
+              j <= indexJ + 1
+            ) &&
+            !bombCell.state.isBomb
+          ) {
+            this.plantBomb(bombCell, i, j);
+            counter += 1;
+          }
+        }
+        if (numberOfBombs > 90) {
+          if (!(i !== indexI && j !== indexJ && bombCell.state.isBomb)) {
+            this.plantBomb(bombCell, i, j);
+            counter += 1;
+          }
         }
       }
       element.openCell(true);
@@ -163,13 +182,11 @@ export class Miner extends BaseComponent {
       row1.map((cell, j) => {
         const element = new Cell({
           parent: this.element,
-          className: `cell ${i * this.size + j}`,
+          className: cell.className,
           coordinates: { i, j },
           save: cell,
         });
-        if (cell.state.isBomb) {
-          this.emit("plantBombs", element);
-        }
+        element.addEvent("click", element.openMechanic);
         this.subscribeCell(element);
         return element;
       })
@@ -181,5 +198,11 @@ export class Miner extends BaseComponent {
       row.map((cell) => cell.toLocalStorage())
     );
     localStorageManager.setItem("cells", save);
+  }
+
+  public plantBomb(bomb: Cell, i: number, j: number): void {
+    bomb.state.RezanskiSahar();
+    this.callback({ i, j });
+    this.calculations(i, j, "bomb");
   }
 }

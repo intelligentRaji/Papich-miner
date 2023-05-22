@@ -1,3 +1,5 @@
+@import "./variables.scss";
+
 .main {
   margin: 0 auto;
   margin-top: 175px;
@@ -12,6 +14,7 @@
   transform: translate(-50%, -50%);
   display: inline-grid;
   grid-template-columns: 500px 350px;
+  align-items: center;
   grid-template-areas:
     "a b"
     "c b";
@@ -28,13 +31,14 @@
   font-size: 30px;
   display: flex;
   justify-content: space-between;
+  color: var(--full-dark);
 }
 
 .miner {
   grid-area: c;
   height: 500px;
   display: grid;
-  background: #384c59;
+  background: var(--field);
   border-radius: 5px;
 }
 
@@ -43,23 +47,35 @@
 }
 
 .cell {
-  background-color: #fff4f4;
+  background-color: var(--cell);
   border-radius: 5px;
-  border: 1px solid #384c59;
+  border: 1px solid var(--field);
   font-weight: 1000;
   font-size: 50%;
   transition: all 0.1s ease 0s;
 }
 
 .cell:hover {
-  background-color: #dbdada;
+  background-color: var(--cell-opened);
+}
+
+.miner.easy .cell {
+  font-size: 25px;
+}
+
+.miner.medium .cell {
+  font-size: 20px;
+}
+
+.miner.hard .cell {
+  font-size: 20px;
 }
 
 .flaged:hover,
 .questioned:hover,
 .bomb:hover,
 .missed:hover {
-  background-color: #fff4f4;
+  background-color: var(--cell);
 }
 
 .opened-bomb:hover {
@@ -67,7 +83,7 @@
 }
 
 .opened {
-  background-color: #dbdada;
+  background-color: var(--cell-opened);
   box-shadow: inset 3px 3px 2px rgba(0, 0, 0, 0.5);
 }
 

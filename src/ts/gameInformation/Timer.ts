@@ -1,5 +1,6 @@
 import { localStorageManager } from "../LocalStorageManager";
 import { BaseComponent } from "../components/BaseComponent";
+import { secondsIntoTime } from "../utils/secondsIntoTime";
 
 declare function setInterval(
   callback: () => void,
@@ -13,18 +14,17 @@ export class Timer extends BaseComponent {
   private seconds: number;
   private interval!: number;
 
-  constructor(parent: HTMLElement) {
-    super({ tag: "span", className: "timer", parent, text: "00:00" });
-    this.seconds = localStorageManager.getItem("time", defaultTime);
+  constructor(parent: HTMLElement, isStarted: boolean) {
+    super({ tag: "span", className: "timer", parent });
+    this.seconds = isStarted
+      ? localStorageManager.getItem("time", defaultTime)
+      : defaultTime;
+    this.setTextContent(secondsIntoTime(this.seconds));
   }
 
   private plusSecond(): void {
     this.seconds += 1;
-    const seconds = `${this.seconds % 60}`;
-    const minutes = `${Math.floor(this.seconds / 60)}`;
-    this.setTextContent(
-      `${minutes.padStart(2, "0")}:${seconds.padStart(2, "0")}`
-    );
+    this.setTextContent(secondsIntoTime(this.seconds));
   }
 
   public start(): void {
