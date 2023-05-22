@@ -15,7 +15,7 @@ const stylesHandler = isProduction
   : "style-loader";
 
 const config = {
-  entry: "./src/ts/index.ts",
+  entry: "./src/js/index.js",
   devtool: "source-map",
   output: {
     filename: "[name].[contenthash].js",

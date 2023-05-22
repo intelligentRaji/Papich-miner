@@ -10,10 +10,10 @@
     "module": "es2020",
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": true,
-    "outDir": "./dist",
+    "outDir": "./src/js",
     "removeComments": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "target": "es2017"
   }
