@@ -13,7 +13,7 @@
     "outDir": "./src/js",
     "removeComments": true,
     "skipLibCheck": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "strict": true,
     "target": "es2017"
   }
