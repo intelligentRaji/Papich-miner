@@ -2,17 +2,13 @@
 
 .main {
   margin: 0 auto;
-  margin-top: 175px;
   max-width: 1280px;
   padding: 0 40px;
 }
 
 .game {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-grid;
+  margin: 175px auto 0 auto;
+  display: grid;
   grid-template-columns: 500px 350px;
   align-items: center;
   grid-template-areas:
@@ -20,10 +16,7 @@
     "c b";
   row-gap: 20px;
   column-gap: 100px;
-}
-
-.game.hard {
-  grid-template-columns: 750px 350px;
+  max-width: 950px;
 }
 
 .information-panel {
@@ -40,10 +33,6 @@
   display: grid;
   background: var(--field);
   border-radius: 5px;
-}
-
-.miner.hard {
-  height: 750px;
 }
 
 .cell {
@@ -68,7 +57,14 @@
 }
 
 .miner.hard .cell {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.miner.hard .opened {
+  box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 .flaged:hover,
@@ -111,4 +107,61 @@
 .missed {
   background-image: url("../assets/svg/miss.svg");
   background-size: cover;
+}
+
+@media (max-width: 1320px) {
+  .game.hard {
+    grid-template-columns: 500px 350px;
+    max-width: 950px;
+  }
+
+  .miner.hard {
+    height: 500px;
+  }
+
+  .miner.hard .cell {
+    width: 20px;
+    height: 20px;
+    font-size: 15px;
+    line-height: 15px;
+  }
+
+  .opened {
+    box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (max-width: 1000px) {
+  .game {
+    grid-template-columns: 500px;
+    grid-template-areas: none;
+    max-width: 500px;
+  }
+
+  .game.hard {
+    grid-template-columns: 500px;
+  }
+
+  .miner {
+    grid-area: auto;
+  }
+
+  .information-panel {
+    grid-area: auto;
+  }
+}
+
+@media (max-width: 580px) {
+  .game {
+    width: 430px;
+    grid-template-columns: 430px;
+  }
+
+  .game.hard {
+    grid-template-columns: 430px;
+  }
+
+  .miner {
+    height: 430px;
+  }
 }

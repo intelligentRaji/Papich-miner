@@ -2,6 +2,8 @@ import { Score } from "./Score";
 import { BaseComponent } from "../components/BaseComponent";
 import { localStorageManager } from "../LocalStorageManager";
 import { Mode } from "../Settings";
+import { ModalComponent } from "../components/ModalComponent";
+import { ButtonComponent } from "../components/ButtonComponent";
 
 export interface IScore {
   bombs: number;
@@ -11,9 +13,10 @@ export interface IScore {
 
 type Cache = Map<IScore, Score>;
 
-export class Scoreboard extends BaseComponent {
+export class Scoreboard extends ModalComponent {
   private scoresArray: IScore[];
   private cache: Cache;
+  private readonly button: ButtonComponent;
   private readonly scoreboardInfrmation: BaseComponent;
   private readonly bombs: BaseComponent;
   private readonly time: BaseComponent;
@@ -24,6 +27,12 @@ export class Scoreboard extends BaseComponent {
     super({ parent, className: "scoreboard" });
     this.cache = new Map();
     this.scoresArray = localStorageManager.getItem("scoreboard", []);
+    this.button = new ButtonComponent({
+      parent: document.body,
+      className: "scoreboard-button",
+      callback: this.visibilityMechanic,
+      text: "РЕЗУЛЬТАТЫ",
+    });
     this.scoreboardInfrmation = new BaseComponent({
       parent: this.element,
       className: "scoreboard-information",

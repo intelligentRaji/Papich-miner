@@ -88,7 +88,7 @@ export class Miner extends BaseComponent {
           }
         }
         if (numberOfBombs > 90) {
-          if (!(i !== indexI && j !== indexJ && bombCell.state.isBomb)) {
+          if (!(i === indexI && j === indexJ) && !bombCell.state.isBomb) {
             this.plantBomb(bombCell, i, j);
             counter += 1;
           }

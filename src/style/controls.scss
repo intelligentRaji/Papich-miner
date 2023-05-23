@@ -104,6 +104,25 @@
   color: var(--full-dark);
 }
 
+.controls-burger-button {
+  display: none;
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  transition: all 0.3s ease 0s;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: transparent;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url("../assets/svg/settings.svg");
+}
+
+.controls-burger-button:hover {
+  transform: scale(1.1) rotate(90deg);
+}
+
 [data-theme="dark"] {
   .volume-button {
     background-image: url("../assets/svg/volume.svg");
@@ -116,6 +135,10 @@
   .lightmode-button {
     background-image: url("../assets/svg/light-mode-dark.png");
   }
+
+  .controls-burger-button {
+    background-image: url("../assets/svg/settings-dark.svg");
+  }
 }
 
 @media (max-width: 1100px) {
@@ -123,8 +146,15 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 300px;
+    transform: translateX(-100%);
+    max-width: 350px;
+    padding: 0 40px;
     height: 100vh;
+    box-shadow: 1px 1px 10px rgba(0, 0, 10, 0.25);
+  }
+
+  .controls.open {
+    transform: translateX(0);
   }
 
   .controls .container {
@@ -135,5 +165,26 @@
     gap: 50px;
     align-items: center;
     height: 50px;
+  }
+
+  .lightmode-button {
+    width: 35px;
+    height: 35px;
+    border: none;
+    background-color: transparent;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url("../assets/svg/light-mode.svg");
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+    flex-shrink: 0;
+  }
+
+  .reset-button {
+    max-width: 200px;
+  }
+
+  .controls-burger-button {
+    display: inline-block;
   }
 }

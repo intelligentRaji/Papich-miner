@@ -47,7 +47,6 @@ export class Game extends BaseComponent {
     this.element.className = save.className;
     this.isStarted = save.isStarted;
     this.cellsLeft = this.isStarted ? save.cellsLeft : defaultValues.cellsLeft;
-    console.log(this.isStarted);
     this.bombsLeft = this.isStarted
       ? new Observable(save.bombsLeft)
       : new Observable(defaultValues.bombsLeft);
@@ -127,7 +126,7 @@ export class Game extends BaseComponent {
         this.informationPanel.start();
         this.backgroundMusic.start();
         this.isStarted = true;
-        this.win();
+        // this.win();
       }
     }
   };
@@ -227,7 +226,7 @@ export class Game extends BaseComponent {
       this.backgroundMusic.win();
       this.openModalWindow(
         `Ты разминировал поле за ${this.informationPanel.getTime()} и ${this.clicks.getValue()} ходов! ` +
-          "Теперь жители могу спать спокойно!"
+          "Теперь жители могут спать спокойно!"
       );
     }
   }
