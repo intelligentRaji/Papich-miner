@@ -1,9 +1,47 @@
+<<<<<<< HEAD:src/js/controls/Controls.js
 import { BombsControler } from "./BombsControler.js";
 import { BaseComponent } from "../components/BaseComponent.js";
 import { VolumeControler } from "./VolumeControler.js";
 import { ModeController } from "./ModeController.js";
 import { LightModeButton } from "./LightModeButton.js";
 export class Controls extends BaseComponent {
+=======
+import { BombsControler } from "./BombsControler";
+import { BaseComponent } from "../components/BaseComponent";
+import { VolumeControler } from "./VolumeControler";
+import { ModeController } from "./ModeController";
+import { LightMode, Mode } from "../Settings";
+import { LightModeButton } from "./LightModeButton";
+import { ModalComponent } from "../components/ModalComponent";
+import { ButtonComponent } from "../components/ButtonComponent";
+
+export type Notify = (params: number) => void;
+
+interface ContolsConstructor {
+  parent: HTMLElement;
+  ostCallback: Notify;
+  effectsCallback: Notify;
+  ostValue: string;
+  effectsValue: string;
+  mode: Mode;
+  lightMode: LightMode;
+  reset: () => void;
+  numberOfBombs: number;
+}
+
+export class Controls extends ModalComponent {
+  public readonly container: BaseComponent;
+  public readonly bombsControler: BombsControler;
+  public readonly ostVolumeController: VolumeControler;
+  public readonly effectsVolumeController: VolumeControler;
+  public readonly modeController: ModeController;
+  public readonly lightModeButton: LightModeButton;
+  public readonly resetButton: BaseComponent;
+  public readonly bombsWrapper: BaseComponent;
+  public readonly bombsText: BaseComponent;
+  public readonly burgerButton: BaseComponent;
+
+>>>>>>> fixOpenMechanic:src/ts/controls/Controls.ts
   constructor({
     parent,
     ostCallback,
@@ -19,6 +57,11 @@ export class Controls extends BaseComponent {
     this.container = new BaseComponent({
       className: "container",
       parent: this.element,
+    });
+    this.burgerButton = new ButtonComponent({
+      className: "controls-burger-button",
+      parent: document.body,
+      callback: this.visibilityMechanic,
     });
     this.bombsWrapper = new BaseComponent({
       className: "bombs-wrapper",
@@ -61,13 +104,12 @@ export class Controls extends BaseComponent {
       this.container.element,
       lightMode
     );
-    this.resetButton = new BaseComponent({
+    this.resetButton = new ButtonComponent({
       parent: this.container.element,
-      tag: "button",
       text: "Начать заново",
       className: "reset-button",
+      callback: reset,
     });
-    this.resetButton.addEvent("click", reset);
   }
   getBombs() {
     return this.bombsControler.getValue();

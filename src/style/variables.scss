@@ -27,3 +27,13 @@
   --cell-opened: #bdbdbd;
   --field: #000000;
 }
+
+@media (max-width: 1100px) {
+  :root {
+    --trasparent-white: rgb(245, 245, 245, 0.9);
+  }
+
+  [data-theme="dark"] {
+    --trasparent-white: rgba(0, 0, 0, 0.8);
+  }
+}

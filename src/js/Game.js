@@ -44,7 +44,6 @@ export class Game extends BaseComponent {
     this.element.className = save.className;
     this.isStarted = save.isStarted;
     this.cellsLeft = this.isStarted ? save.cellsLeft : defaultValues.cellsLeft;
-    console.log(this.isStarted);
     this.bombsLeft = this.isStarted
       ? new Observable(save.bombsLeft)
       : new Observable(defaultValues.bombsLeft);
@@ -110,7 +109,29 @@ export class Game extends BaseComponent {
       this.miner.addEvent("click", this.gameStart);
     }
   }
+<<<<<<< HEAD:src/js/Game.js
   continue() {
+=======
+
+  private gameStart = (e: Event): void => {
+    if (e.target instanceof HTMLButtonElement) {
+      const index = Number(e.target.className.split(" ")[1]);
+      const i = Math.floor(index / this.miner.size);
+      const j = index % this.miner.size;
+      const element = this.miner.cells[i][j];
+      if (!element.state.isFlaged && !element.state.podVoprosikom) {
+        this.miner.startGame(element, i, j);
+        this.miner.removeEvent("click", this.gameStart);
+        this.informationPanel.start();
+        this.backgroundMusic.start();
+        this.isStarted = true;
+        // this.win();
+      }
+    }
+  };
+
+  private continue(): void {
+>>>>>>> fixOpenMechanic:src/ts/Game.ts
     this.informationPanel.start();
     const musicStart = (e) => {
       this.backgroundMusic.start();
@@ -194,7 +215,7 @@ export class Game extends BaseComponent {
       this.backgroundMusic.win();
       this.openModalWindow(
         `Ты разминировал поле за ${this.informationPanel.getTime()} и ${this.clicks.getValue()} ходов! ` +
-          "Теперь жители могу спать спокойно!"
+          "Теперь жители могут спать спокойно!"
       );
     }
   }

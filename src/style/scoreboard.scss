@@ -2,12 +2,12 @@
 
 .scoreboard {
   grid-area: b;
-  background-color: var(--white);
+  background-color: var(--trasparent-white);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--full-dark);
-  color: var(--dark);
+  border: 3px solid var(--dark);
+  color: var(--full-dark);
   height: 438px;
   overflow-y: scroll;
 }
@@ -63,4 +63,56 @@
 .score-mode {
   justify-self: end;
   text-align: end;
+}
+
+.scoreboard-button {
+  display: none;
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  transition: all 0.3s ease 0s;
+  padding: 5px 10px;
+  background-color: transparent;
+  letter-spacing: 1px;
+  font-size: 20px;
+  color: var(--dark);
+  border: 1px solid var(--dark);
+  border-radius: 5px;
+}
+
+.scoreboard-button:hover {
+  background-color: var(--dark);
+  letter-spacing: 1px;
+  font-size: 20px;
+  color: var(--white);
+  border: 1px solid var(--dark);
+  border-radius: 5px;
+}
+
+@media (max-width: 1000px) {
+  .scoreboard {
+    padding-top: 100px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 350px;
+    border: none;
+    box-shadow: 0px 0px 10px rgba(0, 0, 10, 0.25);
+    transition: all 0.3s ease 0s;
+    transform: translateX(100%);
+  }
+
+  .scoreboard.open {
+    transform: translateX(0);
+  }
+
+  .scoreboard-information {
+    border-bottom: 2px solid #000;
+    font-size: 20px;
+  }
+
+  .scoreboard-button {
+    display: inline-block;
+  }
 }

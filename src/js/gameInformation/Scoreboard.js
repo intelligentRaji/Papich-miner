@@ -1,11 +1,46 @@
+<<<<<<< HEAD:src/js/gameInformation/Scoreboard.js
 import { Score } from "./Score.js";
 import { BaseComponent } from "../components/BaseComponent.js";
 import { localStorageManager } from "../LocalStorageManager.js";
 export class Scoreboard extends BaseComponent {
   constructor(parent) {
+=======
+import { Score } from "./Score";
+import { BaseComponent } from "../components/BaseComponent";
+import { localStorageManager } from "../LocalStorageManager";
+import { Mode } from "../Settings";
+import { ModalComponent } from "../components/ModalComponent";
+import { ButtonComponent } from "../components/ButtonComponent";
+
+export interface IScore {
+  bombs: number;
+  time: string;
+  mode: "hard" | "medium" | "easy";
+}
+
+type Cache = Map<IScore, Score>;
+
+export class Scoreboard extends ModalComponent {
+  private scoresArray: IScore[];
+  private cache: Cache;
+  private readonly button: ButtonComponent;
+  private readonly scoreboardInfrmation: BaseComponent;
+  private readonly bombs: BaseComponent;
+  private readonly time: BaseComponent;
+  private readonly mode: BaseComponent;
+  private readonly scores: BaseComponent;
+
+  constructor(parent: HTMLElement) {
+>>>>>>> fixOpenMechanic:src/ts/gameInformation/Scoreboard.ts
     super({ parent, className: "scoreboard" });
     this.cache = new Map();
     this.scoresArray = localStorageManager.getItem("scoreboard", []);
+    this.button = new ButtonComponent({
+      parent: document.body,
+      className: "scoreboard-button",
+      callback: this.visibilityMechanic,
+      text: "РЕЗУЛЬТАТЫ",
+    });
     this.scoreboardInfrmation = new BaseComponent({
       parent: this.element,
       className: "scoreboard-information",
